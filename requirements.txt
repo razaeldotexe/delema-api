@@ -7,3 +7,4 @@ wikipedia-api
 pydantic>=2.0.0
 hashids
 httpx
+duckduckgo-search

@@ -5,6 +5,7 @@ from pydantic import BaseModel
 from typing import List, Optional, Any
 import httpx
 from utils.logger import webhook_logger
+from utils.product_fetcher import fetch_real_products
 
 router = APIRouter(prefix="/ai", tags=["AI Search"])
 
@@ -21,6 +22,8 @@ class ProductResult(BaseModel):
     name: str
     description: str
     price: str
+    source_url: Optional[str] = None
+    source_name: Optional[str] = "AI Recommended"
 
 async def try_gemini(prompt: str) -> str:
     api_key = os.getenv("GEMINI_API_KEY")
@@ -97,17 +100,38 @@ async def try_openrouter(prompt: str) -> str:
 @router.post("/search-products", response_model=List[ProductResult])
 async def search_products(data: ProductSearchRequest):
     """
-    Find products using AI with multi-provider rotation fallback.
+    Hybrid Product Search:
+    1. Fetches REAL data from the web (DuckDuckGo).
+    2. Uses AI to analyze the real data and provide structured recommendations.
     """
+    # Phase 1: Fetch Real Data
+    real_data = fetch_real_products(data.query, max_results=data.limit * 2)
+    
+    context_str = ""
+    if real_data:
+        context_str = "Here are some real search results from the web to help you:\n"
+        for i, item in enumerate(real_data):
+            context_str += f"{i+1}. {item['name']} - {item['description']} (Source: {item['source_url']})\n"
+
+    # Phase 2: AI Processing
     prompt = f"""
-    User is searching for products related to: "{data.query}".
-    Provide a list of up to {data.limit} recommended products with brief descriptions and estimated prices.
-    Format your response ONLY as a raw JSON list like this:
+    User is searching for: "{data.query}".
+    {context_str}
+    
+    Task: Based on the real results above (if any) and your knowledge, provide a list of up to {data.limit} best product recommendations.
+    Include valid source_url from the real data if it matches a recommendation.
+    Format your response ONLY as a raw JSON list:
     [
-        {{"name": "Product Name", "description": "Short summary", "price": "$99.99"}},
+        {{
+            "name": "Product Name", 
+            "description": "Short summary", 
+            "price": "Estimated or real price",
+            "source_url": "Real URL from data above or null",
+            "source_name": "Store name or 'Web Result'"
+        }},
         ...
     ]
-    Do not include any markdown formatting like ```json or any introductory text.
+    Do not include markdown or introductory text.
     """
 
     providers = [
@@ -118,19 +142,18 @@ async def search_products(data: ProductSearchRequest):
 
     for provider in providers:
         try:
-            webhook_logger.log(f"Trying product search with {provider['name']}...", "AI")
+            webhook_logger.log(f"Processing hybrid search with {provider['name']}...", "AI")
             raw_response = await provider["fn"](prompt)
             
-            # Clean response from potential markdown code blocks
             clean_json = raw_response.strip().replace("```json", "").replace("```", "").strip()
             products = json.loads(clean_json)
             
             if isinstance(products, list):
-                webhook_logger.log(f"Product search successful using {provider['name']}", "SUCCESS")
+                webhook_logger.log(f"Hybrid search successful using {provider['name']}", "SUCCESS")
                 return [ProductResult(**p) for p in products[:data.limit]]
                 
         except Exception as e:
-            webhook_logger.log(f"Provider {provider['name']} failed for products: {str(e)}", "WARN")
+            webhook_logger.log(f"Provider {provider['name']} failed: {str(e)}", "WARN")
             continue
 
-    raise HTTPException(status_code=503, detail="All AI providers failed to process the product search request.")
+    raise HTTPException(status_code=503, detail="All AI providers failed to process the hybrid search request.")
