@@ -9,28 +9,43 @@ WEBHOOK_URL = os.getenv("WEBHOOK_URL")
 class WebhookLogger:
     def __init__(self):
         self.queue: List[str] = []
+        self.all_logs: List[str] = [] # Keep history for the current run
         self.is_processing = False
-        self.delay = 5  # Group logs every 5 seconds
+        self.delay = 3  # Update frequency
+        self.message_id = None # Track message for the current run
 
     async def _send_to_webhook(self):
         if not WEBHOOK_URL or not self.queue:
             self.is_processing = False
             return
 
-        # Prepare the log chunk
-        logs = "\n".join(self.queue)
-        self.queue = [] # Clear the queue
+        # Move queue to history
+        self.all_logs.extend(self.queue)
+        self.queue = []
         
-        content = f"**[DELEMA API LOGS - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}]**\n```log\n{logs}\n```"
+        # Prepare the log chunk (Discord limit is ~2000 chars, so we take the last 15-20 lines)
+        logs_display = "\n".join(self.all_logs[-40:]) # Show last 40 lines
+        
+        content = f"**[DELEMA API LOGS - RUN: {datetime.now().strftime('%Y-%m-%d %H:%M')}]**\n```log\n{logs_display}\n```"
 
         async with httpx.AsyncClient() as client:
             try:
-                # Send to Discord
-                await client.post(WEBHOOK_URL, json={"content": content})
+                if self.message_id is None:
+                    # Initial message for this run
+                    # Use wait=true to get the message ID back
+                    response = await client.post(f"{WEBHOOK_URL}?wait=true", json={"content": content})
+                    if response.status_code in [200, 201]:
+                        self.message_id = response.json().get("id")
+                else:
+                    # Edit existing message for this run
+                    # Webhook edit URL: /messages/{id}
+                    edit_url = f"{WEBHOOK_URL}/messages/{self.message_id}"
+                    await client.patch(edit_url, json={"content": content})
+                    
             except Exception as e:
                 print(f"Failed to send logs to webhook: {e}")
 
-        # Wait for delay before allowing next batch
+        # Wait for delay
         await asyncio.sleep(self.delay)
         
         if self.queue:
@@ -42,13 +57,13 @@ class WebhookLogger:
         timestamp = datetime.now().strftime("%H:%M:%S")
         formatted_message = f"[{timestamp}] [{level}] {message}"
         
-        # Also print to local console
+        # Print to local console
         print(formatted_message)
         
-        # Add to queue for webhook
+        # Add to queue
         self.queue.append(formatted_message)
         
-        # Start background task if not already processing
+        # Start processing
         if not self.is_processing:
             self.is_processing = True
             asyncio.create_task(self._send_to_webhook())
