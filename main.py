@@ -2,7 +2,7 @@ import os
 from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
-from routers import recommendations, rules, routing, research, github
+from routers import recommendations, rules, routing, research, github, ai_search
 from utils.logger import webhook_logger
 
 # Configuration
@@ -47,6 +47,7 @@ app.include_router(rules.router, prefix="/api/v1")
 app.include_router(routing.router, prefix="/api/v1")
 app.include_router(research.router, prefix="/api/v1")
 app.include_router(github.router, prefix="/api/v1")
+app.include_router(ai_search.router, prefix="/api/v1")
 
 @app.get("/", response_class=HTMLResponse)
 async def root():
@@ -104,6 +105,12 @@ async def root():
                                 <p class="small text-secondary">Deterministic A/B testing and variant assignment via consistent hashing.</p>
                             </div>
                         </div>
+                        <div class="col-md-4">
+                            <div class="card h-100 p-3">
+                                <h5 class="text-info">AI Search</h5>
+                                <p class="small text-secondary">Find products or information using a multi-AI rotation system.</p>
+                            </div>
+                        </div>
                     </div>
 
                     <h3 class="mb-4">API Documentation</h3>
@@ -115,6 +122,13 @@ async def root():
                                 <h5>/api/v1/recommend/score</h5>
                                 <p class="text-secondary small">Ranks items based on weighted features.</p>
                                 <code>POST {"items": [...], "weights": {"feature_a": 0.8}}</code>
+                            </div>
+
+                            <div class="endpoint">
+                                <span class="badge badge-post mb-2">POST</span>
+                                <h5>/api/v1/ai/search-products</h5>
+                                <p class="text-secondary small">Find products using AI with multi-provider rotation.</p>
+                                <code>POST {"query": "gaming mouse", "limit": 5}</code>
                             </div>
 
                             <div class="endpoint">
