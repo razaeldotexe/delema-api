@@ -1,4 +1,8 @@
-from duckduckgo_search import DDGS
+try:
+    from duckduckgo_search import DDGS
+except ImportError:
+    from ddgs import DDGS
+
 from typing import List, Dict, Any
 from utils.logger import webhook_logger
 
