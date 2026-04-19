@@ -36,14 +36,22 @@ def evaluate_rule(rule: Rule, facts: Dict[str, Any]) -> bool:
     op = rule.operator.upper()
     val = rule.value
 
-    if op == "=": return fact_val == val
-    if op == "!=": return fact_val != val
-    if op == ">": return fact_val > val
-    if op == "<": return fact_val < val
-    if op == ">=": return fact_val >= val
-    if op == "<=": return fact_val <= val
-    if op == "IN": return fact_val in val if isinstance(val, list) else False
-    if op == "NOT IN": return fact_val not in val if isinstance(val, list) else False
+    if op == "=":
+        return fact_val == val
+    if op == "!=":
+        return fact_val != val
+    if op == ">":
+        return fact_val > val
+    if op == "<":
+        return fact_val < val
+    if op == ">=":
+        return fact_val >= val
+    if op == "<=":
+        return fact_val <= val
+    if op == "IN":
+        return fact_val in val if isinstance(val, list) else False
+    if op == "NOT IN":
+        return fact_val not in val if isinstance(val, list) else False
     return False
 
 def evaluate_group(group: RuleGroup, facts: Dict[str, Any]) -> bool:

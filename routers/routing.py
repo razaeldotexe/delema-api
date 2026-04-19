@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from typing import List, Dict, Any, Union
+from typing import List, Dict, Any, Optional
 import hashlib
 
 router = APIRouter(prefix="/routing", tags=["Automated Routing"])
@@ -10,7 +10,6 @@ class Variant(BaseModel):
     weight: float
     data: Optional[Dict[str, Any]] = None
 
-from typing import Optional
 
 class ABTestRequest(BaseModel):
     user_id: str
