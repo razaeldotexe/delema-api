@@ -1,5 +1,5 @@
 import os
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from routers import recommendations, rules, routing, research, github
@@ -23,11 +23,19 @@ app.add_middleware(
 )
 
 @app.middleware("http")
-async def log_requests(request, call_next):
+async def log_requests(request: Request, call_next):
+    # Ignore favicon spam
+    if request.url.path == "/favicon.ico":
+        return await call_next(request)
+        
     webhook_logger.log(f"Request: {request.method} {request.url.path}")
     response = await call_next(request)
     webhook_logger.log(f"Response: {response.status_code}")
     return response
+
+@app.get("/favicon.ico", include_in_schema=False)
+async def favicon():
+    return Response(status_code=204)
 
 @app.on_event("startup")
 async def startup_event():
