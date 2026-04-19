@@ -2,7 +2,7 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
-from routers import recommendations, rules, routing
+from routers import recommendations, rules, routing, research, github
 
 # Configuration
 PORT = int(os.getenv("PORT", 8000))
@@ -25,6 +25,8 @@ app.add_middleware(
 app.include_router(recommendations.router, prefix="/api/v1")
 app.include_router(rules.router, prefix="/api/v1")
 app.include_router(routing.router, prefix="/api/v1")
+app.include_router(research.router, prefix="/api/v1")
+app.include_router(github.router, prefix="/api/v1")
 
 @app.get("/", response_class=HTMLResponse)
 async def root():
