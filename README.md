@@ -1,45 +1,38 @@
 # Delema API
 
-Delema API is a decision-support API designed to help developers handle complex logic, recommendations, and automated choices in their applications. This unified API combines powerful research tools with high-performance multimedia processing.
+Delema API is a specialized decision-support engine designed to help developers handle complex logic, recommendations, and automated choices in their applications. It provides a set of high-performance tools for scoring, rule evaluation, and deterministic routing.
 
 ## Key Features
 
-### Research & Data Extraction
-- **ArXiv Search**: Access millions of scientific papers with detailed metadata.
-- **Wikipedia Integration**: Fetch summaries and full article data in multiple languages.
-- **Nerd Font Discovery**: Search and filter through the Nerd Fonts collection.
-- **GitHub Repository Scanner**: Recursively scan repositories for Markdown files and retrieve content.
+### Recommendations & Scoring
+- **Weighted Scoring**: Rank items based on multiple weighted features.
+- **Dynamic Prioritization**: Calculate importance scores on-the-fly for feeds or search results.
 
-### Video & Audio Processing
-- **Metadata Extraction**: Get detailed video info without downloading.
-- **Multi-platform Support**: Works with YouTube (Shorts, Music), TikTok, Instagram, Twitter/X, and 1000+ more via `yt-dlp`.
-- **Audio Extraction**: High-quality MP3 and M4A conversion.
-- **Progress Tracking**: Real-time download status updates via Task IDs.
-- **Auto-Cleanup**: Temporary files are automatically removed after delivery.
+### Business Logic & Rules Engine
+- **Boolean Evaluation**: Evaluate complex, nested AND/OR conditions against input facts.
+- **Decision Trees**: Traverse JSON-based decision trees to automate multi-step logic.
+- **Rich Operators**: Supports `=`, `!=`, `>`, `<`, `>=`, `<=`, `IN`, and `NOT IN`.
 
-## API Endpoints
+### Automated Choices & Routing
+- **Deterministic A/B Testing**: Consistent variant assignment using hashing (consistent hashing).
+- **Weighted Distribution**: Route users to different features or configurations based on custom percentages.
 
-### General
-- `GET /`: API status and documentation landing page.
+## API Endpoints (v1)
 
-### Research
-- `GET /arxiv?q={query}`
-- `GET /wikipedia?q={query}&lang={lang}`
-- `GET /nerdfont?q={query}`
-- `POST /github/scan`: Body `{"owner": "", "repo": "", "token": "", "path": ""}`
-- `POST /github/content`: Body `{"owner": "", "repo": "", "token": "", "path": ""}`
+### Recommendations
+- `POST /api/v1/recommend/score`: Ranks items based on weighted features.
 
-### Multimedia
-- `GET /info?url={url}`
-- `GET /download?url={url}&format={best|mp4|mp3|m4a}`
-- `GET /progress/{task_id}`
+### Rules Engine
+- `POST /api/v1/rules/evaluate`: Evaluates logical rulesets against facts.
+- `POST /api/v1/rules/decision-tree`: Traverses a decision tree to return an outcome.
+
+### Automated Routing
+- `POST /api/v1/routing/ab-test`: Assigns a user to a variant deterministically.
 
 ## Getting Started
 
 ### Prerequisites
 - **Python 3.10+**
-- **FFmpeg**: Required for audio extraction.
-- **Node.js**: Required by `yt-dlp` for certain signature decryptions.
 
 ### Installation
 1. Clone the repository:
@@ -59,7 +52,7 @@ Delema API is a decision-support API designed to help developers handle complex 
    ```
 
 ## Deployment
-This API is ready for deployment on **Railway** or any platform supporting **Nixpacks** or **Procfile**. Ensure you provide a `PORT` environment variable.
+This API is ready for deployment on **Railway**, **Render**, or any platform supporting **Nixpacks** or **Procfile**.
 
 ---
 &copy; 2026 OpenZero Project.
