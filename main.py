@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from routers import recommendations, rules, routing, research, github
+from utils.logger import webhook_logger
 
 # Configuration
 PORT = int(os.getenv("PORT", 8000))
@@ -20,6 +21,17 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.middleware("http")
+async def log_requests(request, call_next):
+    webhook_logger.log(f"Request: {request.method} {request.url.path}")
+    response = await call_next(request)
+    webhook_logger.log(f"Response: {response.status_code}")
+    return response
+
+@app.on_event("startup")
+async def startup_event():
+    webhook_logger.log("Delema API is starting up...", "SYSTEM")
 
 # Include Routers
 app.include_router(recommendations.router, prefix="/api/v1")
