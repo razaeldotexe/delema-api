@@ -2,7 +2,7 @@ import os
 from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
-from routers import recommendations, rules, routing, research, github, ai_search
+from routers import recommendations, rules, routing, research, github, ai_search, app_search
 from utils.logger import webhook_logger
 
 # Configuration
@@ -48,6 +48,7 @@ app.include_router(routing.router, prefix="/api/v1")
 app.include_router(research.router, prefix="/api/v1")
 app.include_router(github.router, prefix="/api/v1")
 app.include_router(ai_search.router, prefix="/api/v1")
+app.include_router(app_search.router, prefix="/api/v1")
 
 @app.get("/", response_class=HTMLResponse)
 async def root():
@@ -150,6 +151,20 @@ async def root():
                                 <h5>/api/v1/routing/ab-test</h5>
                                 <p class="text-secondary small">Assigns a user to a variant deterministically.</p>
                                 <code>POST {"user_id": "u123", "variants": [{"name": "A", "weight": 50}]}</code>
+                            </div>
+
+                            <div class="endpoint">
+                                <span class="badge badge-post mb-2">POST</span>
+                                <h5>/api/v1/apps/fdroid</h5>
+                                <p class="text-secondary small">Search for apps on F-Droid.</p>
+                                <code>POST {"query": "termux", "limit": 5}</code>
+                            </div>
+
+                            <div class="endpoint">
+                                <span class="badge badge-post mb-2">POST</span>
+                                <h5>/api/v1/apps/github</h5>
+                                <p class="text-secondary small">Search for Android apps on GitHub.</p>
+                                <code>POST {"query": "termux", "limit": 5}</code>
                             </div>
                         </div>
                     </div>
