@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+yt-dlp
+slowapi
+python-dotenv
+aiofiles
+python-multipart
+arxiv
+wikipedia-api
