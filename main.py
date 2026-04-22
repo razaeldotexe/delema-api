@@ -2,7 +2,7 @@ import os
 from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, RedirectResponse
-from routers import recommendations, rules, routing, research, github, ai_search, app_search, fda
+from routers import recommendations, rules, routing, research, github, ai_search, app_search, fda, weather
 from utils.logger import webhook_logger
 
 # Configuration
@@ -50,6 +50,7 @@ app.include_router(github.router, prefix="/api/v1")
 app.include_router(ai_search.router, prefix="/api/v1")
 app.include_router(app_search.router, prefix="/api/v1")
 app.include_router(fda.router, prefix="/api/v1")
+app.include_router(weather.router, prefix="/api/v1")
 
 @app.get("/", include_in_schema=False)
 async def root():
