@@ -35,6 +35,19 @@ Delema API is a specialized decision-support engine designed to help developers 
 - **Node.js 18+**
 - **pnpm** (recommended)
 
+### Environment Configuration
+
+This API uses `dotenv` for secret management. **Never commit your `.env` file to the repository.**
+
+1. Copy the example file to `.env`:
+   ```bash
+   cp .env.example .env
+   ```
+2. Edit `.env` and fill in your configuration:
+   - `PORT`: The port the server will run on (default: 8000).
+   - `WEBHOOK_URL`: (Optional) A Discord or Slack webhook URL for asynchronous log batching.
+   - `NODE_ENV`: Set to `production` for deployment.
+
 ### Installation
 1. Clone the repository:
    ```bash
