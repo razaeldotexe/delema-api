@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
 import axios from 'axios';
-import { AppSearchRequestSchema, TrendingRequestSchema } from '../types/schemas';
+import { AppSearchRequestSchema, AppStoreSearchRequestSchema, TrendingRequestSchema } from '../types/schemas';
 
 const router = Router();
 
@@ -105,6 +105,33 @@ router.post('/github', async (req: Request, res: Response) => {
       icon_url: repo.owner?.avatar_url,
       url: repo.html_url,
       source: "github"
+    }));
+    return res.json(results);
+  } catch (error: any) {
+    return res.status(error.response?.status || 500).json({ detail: error.message });
+  }
+});
+
+/**
+ * Search for iOS applications on the Apple App Store.
+ */
+router.post('/appstore', async (req: Request, res: Response) => {
+  const validation = AppStoreSearchRequestSchema.safeParse(req.body);
+  if (!validation.success) {
+    return res.status(422).json({ detail: validation.error.errors });
+  }
+
+  const { query, limit = 10, country = "us" } = validation.data;
+  const url = `https://itunes.apple.com/search?entity=software&term=${encodeURIComponent(query)}&limit=${limit}&country=${country}`;
+  
+  try {
+    const response = await axios.get(url, { timeout: 10000 });
+    const results = (response.data.results || []).map((item: any) => ({
+      name: item.trackName,
+      summary: item.description,
+      icon_url: item.artworkUrl60,
+      url: item.trackViewUrl,
+      source: "appstore"
     }));
     return res.json(results);
   } catch (error: any) {

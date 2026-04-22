@@ -106,6 +106,14 @@ export const AppSearchRequestSchema = z.object({
 
 export type AppSearchRequest = z.infer<typeof AppSearchRequestSchema>;
 
+export const AppStoreSearchRequestSchema = z.object({
+  query: z.string(),
+  limit: z.number().optional().default(10),
+  country: z.string().optional().default("us"),
+});
+
+export type AppStoreSearchRequest = z.infer<typeof AppStoreSearchRequestSchema>;
+
 export const AppSearchResultSchema = z.object({
   name: z.string(),
   summary: z.string().optional().nullable(),
