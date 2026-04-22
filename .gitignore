@@ -4,3 +4,4 @@ dist
 *.log
 pnpm-debug.log*
 .DS_Store
+docs/maestro/
