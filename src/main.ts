@@ -36,7 +36,7 @@ app.use(express.json());
 app.use(requestLogger);
 
 // Startup log
-webhookLogger.log("Delema API (Node.js) is starting up...", "SYSTEM");
+webhookLogger.log('Delema API (Node.js) is starting up...', 'SYSTEM');
 
 // Routes
 const apiPrefix = '/api/v1';

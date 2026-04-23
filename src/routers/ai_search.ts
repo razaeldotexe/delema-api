@@ -17,10 +17,10 @@ router.post('/app-availability', async (req: Request, res: Response) => {
   try {
     // Phase 1: Search for Store Links
     const storeResults = await fetchStoreLinks(query);
-    
-    let contextStr = "";
+
+    let contextStr = '';
     if (storeResults.length > 0) {
-      contextStr = "Here are official store search results from the web:\n";
+      contextStr = 'Here are official store search results from the web:\n';
       storeResults.forEach((item, i) => {
         contextStr += `${i + 1}. ${item.name} - ${item.source_url}\n`;
       });
@@ -49,29 +49,35 @@ router.post('/app-availability', async (req: Request, res: Response) => {
     `;
 
     const providers = [
-      { name: "Gemini", fn: tryGemini },
-      { name: "Groq", fn: tryGroq },
-      { name: "OpenRouter", fn: tryOpenRouter }
+      { name: 'Gemini', fn: tryGemini },
+      { name: 'Groq', fn: tryGroq },
+      { name: 'OpenRouter', fn: tryOpenRouter },
     ];
 
     for (const provider of providers) {
       try {
-        webhookLogger.log(`Processing app availability with ${provider.name}...`, "AI");
+        webhookLogger.log(`Processing app availability with ${provider.name}...`, 'AI');
         const rawResponse = await provider.fn(prompt);
-        
-        const cleanJson = rawResponse.trim().replace(/```json/g, "").replace(/```/g, "").trim();
+
+        const cleanJson = rawResponse
+          .trim()
+          .replace(/```json/g, '')
+          .replace(/```/g, '')
+          .trim();
         const result = JSON.parse(cleanJson);
-        
+
         if (result && result.app_name) {
-          webhookLogger.log(`Availability check successful using ${provider.name}`, "SUCCESS");
+          webhookLogger.log(`Availability check successful using ${provider.name}`, 'SUCCESS');
           return res.json(result);
         }
       } catch (error: any) {
-        webhookLogger.log(`Provider ${provider.name} failed: ${error.message}`, "WARN");
+        webhookLogger.log(`Provider ${provider.name} failed: ${error.message}`, 'WARN');
       }
     }
 
-    return res.status(503).json({ detail: "All AI providers failed to process the availability check." });
+    return res
+      .status(503)
+      .json({ detail: 'All AI providers failed to process the availability check.' });
   } catch (error: any) {
     return res.status(500).json({ detail: error.message });
   }
@@ -88,10 +94,10 @@ router.post('/search-products', async (req: Request, res: Response) => {
   try {
     // Phase 1: Fetch Real Data
     const realData = await fetchRealProducts(query, limit * 2);
-    
-    let contextStr = "";
+
+    let contextStr = '';
     if (realData.length > 0) {
-      contextStr = "Here are some real search results from the web to help you:\n";
+      contextStr = 'Here are some real search results from the web to help you:\n';
       realData.forEach((item, i) => {
         contextStr += `${i + 1}. ${item.name} - ${item.description} (Source: ${item.source_url})\n`;
       });
@@ -119,29 +125,35 @@ router.post('/search-products', async (req: Request, res: Response) => {
     `;
 
     const providers = [
-      { name: "Gemini", fn: tryGemini },
-      { name: "Groq", fn: tryGroq },
-      { name: "OpenRouter", fn: tryOpenRouter }
+      { name: 'Gemini', fn: tryGemini },
+      { name: 'Groq', fn: tryGroq },
+      { name: 'OpenRouter', fn: tryOpenRouter },
     ];
 
     for (const provider of providers) {
       try {
-        webhookLogger.log(`Processing hybrid search with ${provider.name}...`, "AI");
+        webhookLogger.log(`Processing hybrid search with ${provider.name}...`, 'AI');
         const rawResponse = await provider.fn(prompt);
-        
-        const cleanJson = rawResponse.trim().replace(/```json/g, "").replace(/```/g, "").trim();
+
+        const cleanJson = rawResponse
+          .trim()
+          .replace(/```json/g, '')
+          .replace(/```/g, '')
+          .trim();
         const products = JSON.parse(cleanJson);
-        
+
         if (Array.isArray(products)) {
-          webhookLogger.log(`Hybrid search successful using ${provider.name}`, "SUCCESS");
+          webhookLogger.log(`Hybrid search successful using ${provider.name}`, 'SUCCESS');
           return res.json(products.slice(0, limit));
         }
       } catch (error: any) {
-        webhookLogger.log(`Provider ${provider.name} failed: ${error.message}`, "WARN");
+        webhookLogger.log(`Provider ${provider.name} failed: ${error.message}`, 'WARN');
       }
     }
 
-    return res.status(503).json({ detail: "All AI providers failed to process the hybrid search request." });
+    return res
+      .status(503)
+      .json({ detail: 'All AI providers failed to process the hybrid search request.' });
   } catch (error: any) {
     return res.status(500).json({ detail: error.message });
   }

@@ -10,7 +10,7 @@ const router: Router = express.Router();
 router.post('/score', (req, res) => {
   try {
     const data = ScoreRequestSchema.parse(req.body);
-    
+
     if (!data.items || data.items.length === 0) {
       return res.json({ scored_items: [] });
     }

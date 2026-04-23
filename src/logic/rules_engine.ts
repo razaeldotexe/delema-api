@@ -62,12 +62,20 @@ export function traverseTree(node: DecisionTreeNode, facts: Record<string, any>)
 
   if (node.condition) {
     if (evaluateRule(node.condition, facts)) {
-      if (node.true_node && typeof node.true_node === 'object' && ('condition' in node.true_node || 'value' in node.true_node)) {
+      if (
+        node.true_node &&
+        typeof node.true_node === 'object' &&
+        ('condition' in node.true_node || 'value' in node.true_node)
+      ) {
         return traverseTree(node.true_node as DecisionTreeNode, facts);
       }
       return node.true_node;
     } else {
-      if (node.false_node && typeof node.false_node === 'object' && ('condition' in node.false_node || 'value' in node.false_node)) {
+      if (
+        node.false_node &&
+        typeof node.false_node === 'object' &&
+        ('condition' in node.false_node || 'value' in node.false_node)
+      ) {
         return traverseTree(node.false_node as DecisionTreeNode, facts);
       }
       return node.false_node;

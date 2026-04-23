@@ -6,8 +6,23 @@ declare module 'duckduckgo-search' {
   }
 
   interface SearchApi {
-    text(keywords: string, region?: string, safesearch?: string, timelimit?: string | null): AsyncGenerator<SearchResult>;
-    images(keywords: string, region?: string, safesearch?: string, timelimit?: string | null, size?: string | null, color?: string | null, type_image?: string | null, layout?: string | null, license_image?: string | null): AsyncGenerator<any>;
+    text(
+      keywords: string,
+      region?: string,
+      safesearch?: string,
+      timelimit?: string | null,
+    ): AsyncGenerator<SearchResult>;
+    images(
+      keywords: string,
+      region?: string,
+      safesearch?: string,
+      timelimit?: string | null,
+      size?: string | null,
+      color?: string | null,
+      type_image?: string | null,
+      layout?: string | null,
+      license_image?: string | null,
+    ): AsyncGenerator<any>;
   }
 
   const ddgs: SearchApi;

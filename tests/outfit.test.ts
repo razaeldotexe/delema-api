@@ -16,13 +16,13 @@ describe('Outfit Rating API', () => {
     const mockImageBuffer = Buffer.from('fake-image-data');
     (axios.get as any).mockResolvedValue({
       data: mockImageBuffer,
-      headers: { 'content-type': 'image/png' }
+      headers: { 'content-type': 'image/png' },
     });
 
     const mockAiResponse = JSON.stringify({
       score: 8,
-      feedback: "Great summer look!",
-      suggestions: ["Add sunglasses"]
+      feedback: 'Great summer look!',
+      suggestions: ['Add sunglasses'],
     });
     (aiHelper.tryGeminiVision as any).mockResolvedValue(mockAiResponse);
 
@@ -33,26 +33,27 @@ describe('Outfit Rating API', () => {
     expect(response.status).toBe(200);
     expect(response.body).toEqual({
       score: 8,
-      feedback: "Great summer look!",
-      suggestions: ["Add sunglasses"]
+      feedback: 'Great summer look!',
+      suggestions: ['Add sunglasses'],
     });
 
     expect(axios.get).toHaveBeenCalledWith('https://example.com/outfit.png', expect.anything());
     expect(aiHelper.tryGeminiVision).toHaveBeenCalledWith(
       expect.stringContaining('summer party'),
       'image/png',
-      mockImageBuffer.toString('base64')
+      mockImageBuffer.toString('base64'),
     );
   });
 
   it('should rate an outfit from base64 data', async () => {
-    const base64Data = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
+    const base64Data =
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
     const base64Input = `data:image/png;base64,${base64Data}`;
 
     const mockAiResponse = JSON.stringify({
       score: 7,
-      feedback: "Casual and comfortable.",
-      suggestions: ["Try a different color shoes"]
+      feedback: 'Casual and comfortable.',
+      suggestions: ['Try a different color shoes'],
     });
     (aiHelper.tryGeminiVision as any).mockResolvedValue(mockAiResponse);
 
@@ -65,26 +66,24 @@ describe('Outfit Rating API', () => {
     expect(aiHelper.tryGeminiVision).toHaveBeenCalledWith(
       expect.anything(),
       'image/png',
-      base64Data
+      base64Data,
     );
   });
 
   it('should return 422 if no image is provided', async () => {
-    const response = await request(app)
-      .post('/api/v1/outfit/rate')
-      .send({ context: 'test' });
+    const response = await request(app).post('/api/v1/outfit/rate').send({ context: 'test' });
 
     expect(response.status).toBe(422);
   });
 
   it('should handle AI rotation failure', async () => {
-    (aiHelper.tryGeminiVision as any).mockRejectedValue(new Error("All Gemini Vision models failed"));
+    (aiHelper.tryGeminiVision as any).mockRejectedValue(
+      new Error('All Gemini Vision models failed'),
+    );
 
-    const response = await request(app)
-      .post('/api/v1/outfit/rate')
-      .send({ image_base64: 'abc' });
+    const response = await request(app).post('/api/v1/outfit/rate').send({ image_base64: 'abc' });
 
     expect(response.status).toBe(500);
-    expect(response.body.detail).toBe("All Gemini Vision models failed");
+    expect(response.body.detail).toBe('All Gemini Vision models failed');
   });
 });

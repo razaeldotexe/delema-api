@@ -28,7 +28,7 @@ export const RuleGroupSchema: z.ZodType<RuleGroup> = z.lazy(() =>
   z.object({
     condition: z.string(),
     rules: z.array(z.union([RuleSchema, RuleGroupSchema])),
-  })
+  }),
 );
 
 export const EvaluateRequestSchema = z.object({
@@ -51,7 +51,7 @@ export const DecisionTreeNodeSchema: z.ZodType<DecisionTreeNode> = z.lazy(() =>
     true_node: z.union([DecisionTreeNodeSchema, z.any()]).optional().nullable(),
     false_node: z.union([DecisionTreeNodeSchema, z.any()]).optional().nullable(),
     value: z.any().optional().nullable(),
-  })
+  }),
 );
 
 export const DecisionTreeRequestSchema = z.object({
@@ -109,7 +109,7 @@ export type AppSearchRequest = z.infer<typeof AppSearchRequestSchema>;
 export const AppStoreSearchRequestSchema = z.object({
   query: z.string(),
   limit: z.number().optional().default(10),
-  country: z.string().optional().default("us"),
+  country: z.string().optional().default('us'),
 });
 
 export type AppStoreSearchRequest = z.infer<typeof AppStoreSearchRequestSchema>;
@@ -132,11 +132,13 @@ export type AppCheckRequest = z.infer<typeof AppCheckRequestSchema>;
 
 export const AppCheckResultSchema = z.object({
   app_name: z.string(),
-  platforms: z.array(z.object({
-    name: z.string(),
-    category: z.string(),
-    url: z.string(),
-  })),
+  platforms: z.array(
+    z.object({
+      name: z.string(),
+      category: z.string(),
+      url: z.string(),
+    }),
+  ),
 });
 
 export type AppCheckResult = z.infer<typeof AppCheckResultSchema>;
@@ -280,14 +282,16 @@ export type WeatherResponse = z.infer<typeof WeatherResponseSchema>;
 
 // --- Outfit Rating ---
 
-export const OutfitRatingRequestSchema = z.object({
-  image_url: z.string().url().optional(),
-  image_base64: z.string().optional(),
-  context: z.string().optional(),
-}).refine(data => data.image_url || data.image_base64, {
-  message: "Either image_url or image_base64 must be provided",
-  path: ["image_url", "image_base64"],
-});
+export const OutfitRatingRequestSchema = z
+  .object({
+    image_url: z.string().url().optional(),
+    image_base64: z.string().optional(),
+    context: z.string().optional(),
+  })
+  .refine((data) => data.image_url || data.image_base64, {
+    message: 'Either image_url or image_base64 must be provided',
+    path: ['image_url', 'image_base64'],
+  });
 
 export type OutfitRatingRequest = z.infer<typeof OutfitRatingRequestSchema>;
 

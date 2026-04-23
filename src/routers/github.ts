@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
 import axios from 'axios';
-import { GitHubScanRequestSchema, GitHubContentRequestSchema, FileInfoSchema } from '../types/schemas';
+import { GitHubScanRequestSchema, GitHubContentRequestSchema } from '../types/schemas';
 
 const router = Router();
 
@@ -16,8 +16,8 @@ router.post('/scan', async (req: Request, res: Response) => {
   const { owner, repo, token, path } = validation.data;
   const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
   const headers: Record<string, string> = {
-    'Accept': 'application/vnd.github.v3+json',
-    'User-Agent': 'Delema-API-NodeJS'
+    Accept: 'application/vnd.github.v3+json',
+    'User-Agent': 'Delema-API-NodeJS',
   };
   if (token) {
     headers['Authorization'] = `token ${token}`;
@@ -36,7 +36,7 @@ router.post('/scan', async (req: Request, res: Response) => {
         name: item.name,
         path: item.path,
         type: item.type,
-        download_url: item.download_url
+        download_url: item.download_url,
       }));
 
     return res.json(files);
@@ -59,8 +59,8 @@ router.post('/content', async (req: Request, res: Response) => {
   const { owner, repo, token, path } = validation.data;
   const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
   const headers: Record<string, string> = {
-    'Accept': 'application/vnd.github.v3.raw',
-    'User-Agent': 'Delema-API-NodeJS'
+    Accept: 'application/vnd.github.v3.raw',
+    'User-Agent': 'Delema-API-NodeJS',
   };
   if (token) {
     headers['Authorization'] = `token ${token}`;

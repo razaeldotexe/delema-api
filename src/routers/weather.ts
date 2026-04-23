@@ -11,14 +11,25 @@ const router = Router();
 function getWMOCondition(code: number): string {
   const mapping: Record<number, string> = {
     0: 'Clear Sky',
-    1: 'Mainly Clear', 2: 'Partly Cloudy', 3: 'Overcast',
-    45: 'Fog', 48: 'Depositing Rime Fog',
-    51: 'Light Drizzle', 53: 'Moderate Drizzle', 55: 'Dense Drizzle',
-    61: 'Slight Rain', 63: 'Moderate Rain', 65: 'Heavy Rain',
-    80: 'Slight Rain Showers', 81: 'Moderate Rain Showers', 82: 'Violent Rain Showers',
-    95: 'Thunderstorm', 96: 'Thunderstorm with Hail', 99: 'Thunderstorm with Heavy Hail'
+    1: 'Mainly Clear',
+    2: 'Partly Cloudy',
+    3: 'Overcast',
+    45: 'Fog',
+    48: 'Depositing Rime Fog',
+    51: 'Light Drizzle',
+    53: 'Moderate Drizzle',
+    55: 'Dense Drizzle',
+    61: 'Slight Rain',
+    63: 'Moderate Rain',
+    65: 'Heavy Rain',
+    80: 'Slight Rain Showers',
+    81: 'Moderate Rain Showers',
+    82: 'Violent Rain Showers',
+    95: 'Thunderstorm',
+    96: 'Thunderstorm with Hail',
+    99: 'Thunderstorm with Heavy Hail',
   };
-  
+
   if (mapping[code]) return mapping[code];
   if (code < 50) return 'Cloudy';
   if (code < 80) return 'Rainy';
@@ -47,13 +58,13 @@ router.get('/', async (req: Request, res: Response) => {
     if (city) {
       const geoUrl = 'https://geocoding-api.open-meteo.com/v1/search';
       const geoResp = await axios.get(geoUrl, {
-        params: { name: city, count: 1, language: 'en', format: 'json' }
+        params: { name: city, count: 1, language: 'en', format: 'json' },
       });
-      
+
       if (!geoResp.data.results || geoResp.data.results.length === 0) {
         return res.status(404).json({ detail: `City '${city}' not found` });
       }
-      
+
       const loc = geoResp.data.results[0];
       finalLat = loc.latitude;
       finalLon = loc.longitude;
@@ -69,9 +80,9 @@ router.get('/', async (req: Request, res: Response) => {
       current: 'temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code',
       hourly: 'temperature_2m,weather_code',
       daily: 'weather_code,temperature_2m_max,temperature_2m_min',
-      timezone: tz
+      timezone: tz,
     };
-    
+
     const wResp = await axios.get(weatherUrl, { params: weatherParams });
     const wData = wResp.data;
 
@@ -80,14 +91,14 @@ router.get('/', async (req: Request, res: Response) => {
       max_temp: wData.daily.temperature_2m_max[i],
       min_temp: wData.daily.temperature_2m_min[i],
       condition: getWMOCondition(wData.daily.weather_code[i]),
-      weather_code: wData.daily.weather_code[i]
+      weather_code: wData.daily.weather_code[i],
     }));
 
     const hourlyItems = wData.hourly.time.map((time: string, i: number) => ({
       time: time,
       temperature: wData.hourly.temperature_2m[i],
       condition: getWMOCondition(wData.hourly.weather_code[i]),
-      weather_code: wData.hourly.weather_code[i]
+      weather_code: wData.hourly.weather_code[i],
     }));
 
     const responseData = {
@@ -98,16 +109,19 @@ router.get('/', async (req: Request, res: Response) => {
         wind_speed: wData.current.wind_speed_10m,
         humidity: wData.current.relative_humidity_2m,
         condition: getWMOCondition(wData.current.weather_code),
-        weather_code: wData.current.weather_code
+        weather_code: wData.current.weather_code,
       },
       daily: dailyItems,
-      hourly: hourlyItems
+      hourly: hourlyItems,
     };
 
     // Validate with Zod
     const validation = WeatherResponseSchema.safeParse(responseData);
     if (!validation.success) {
-      webhookLogger.log(`Weather Validation Error: ${JSON.stringify(validation.error.errors)}`, 'ERROR');
+      webhookLogger.log(
+        `Weather Validation Error: ${JSON.stringify(validation.error.errors)}`,
+        'ERROR',
+      );
       return res.status(500).json({ detail: 'Internal server error: Invalid weather data format' });
     }
 

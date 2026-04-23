@@ -73,7 +73,7 @@ describe('Rules Engine', () => {
       };
       expect(evaluateGroup(group, facts)).toBe(true);
       expect(evaluateGroup({ ...group, condition: 'OR' }, facts)).toBe(true);
-      
+
       const failingGroup: RuleGroup = {
         condition: 'AND',
         rules: [
