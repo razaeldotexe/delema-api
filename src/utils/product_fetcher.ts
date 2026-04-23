@@ -40,3 +40,36 @@ export async function fetchRealProducts(query: string, maxResults = 5): Promise<
 
   return results;
 }
+
+/**
+ * Mencari link store aplikasi di berbagai platform (Mobile, PC, Console).
+ */
+export async function fetchStoreLinks(query: string): Promise<ProductResult[]> {
+  const results: ProductResult[] = [];
+  try {
+    webhookLogger.log(`Searching store links for: ${query}`, 'APP_CHECKER');
+    
+    // Query tertarget untuk berbagai store utama
+    const searchQuery = `${query} (site:play.google.com OR site:apps.apple.com OR site:store.steampowered.com OR site:epicgames.com OR site:store.playstation.com OR site:xbox.com OR site:nintendo.com)`;
+    
+    let count = 0;
+    for await (const r of ddgs.text(searchQuery)) {
+      if (count >= 15) break; // Ambil lebih banyak untuk AI
+      
+      results.push({
+        name: r.title || 'Store Page',
+        description: r.body || '',
+        source_url: r.href || '#',
+        source_name: 'Store Result'
+      });
+      
+      count++;
+    }
+
+    webhookLogger.log(`Found ${results.length} potential store links.`, 'SUCCESS');
+  } catch (error) {
+    webhookLogger.log(`App Store Search failed: ${error instanceof Error ? error.message : String(error)}`, 'ERROR');
+  }
+
+  return results;
+}

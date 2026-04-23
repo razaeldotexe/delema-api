@@ -124,6 +124,23 @@ export const AppSearchResultSchema = z.object({
 
 export type AppSearchResult = z.infer<typeof AppSearchResultSchema>;
 
+export const AppCheckRequestSchema = z.object({
+  query: z.string(),
+});
+
+export type AppCheckRequest = z.infer<typeof AppCheckRequestSchema>;
+
+export const AppCheckResultSchema = z.object({
+  app_name: z.string(),
+  platforms: z.array(z.object({
+    name: z.string(),
+    category: z.string(),
+    url: z.string(),
+  })),
+});
+
+export type AppCheckResult = z.infer<typeof AppCheckResultSchema>;
+
 export const TrendingRequestSchema = z.object({
   source: z.string(),
   limit: z.number().optional().default(10),
