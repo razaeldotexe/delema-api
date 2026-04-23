@@ -278,26 +278,23 @@ export const WeatherResponseSchema = z.object({
 
 export type WeatherResponse = z.infer<typeof WeatherResponseSchema>;
 
-// --- GIF Search ---
+// --- Outfit Rating ---
 
-export const GifSearchRequestSchema = z.object({
-  query: z.string(),
+export const OutfitRatingRequestSchema = z.object({
+  image_url: z.string().url().optional(),
+  image_base64: z.string().optional(),
+  context: z.string().optional(),
+}).refine(data => data.image_url || data.image_base64, {
+  message: "Either image_url or image_base64 must be provided",
+  path: ["image_url", "image_base64"],
 });
 
-export type GifSearchRequest = z.infer<typeof GifSearchRequestSchema>;
+export type OutfitRatingRequest = z.infer<typeof OutfitRatingRequestSchema>;
 
-export const GifTrendingRequestSchema = z.object({
-  limit: z.number().optional().default(10),
+export const OutfitRatingResultSchema = z.object({
+  score: z.number().min(1).max(10),
+  feedback: z.string(),
+  suggestions: z.array(z.string()),
 });
 
-export type GifTrendingRequest = z.infer<typeof GifTrendingRequestSchema>;
-
-export const GifResultSchema = z.object({
-  id: z.string(),
-  title: z.string(),
-  original_url: z.string(),
-  preview_url: z.string(),
-  source_link: z.string(),
-});
-
-export type GifResult = z.infer<typeof GifResultSchema>;
+export type OutfitRatingResult = z.infer<typeof OutfitRatingResultSchema>;

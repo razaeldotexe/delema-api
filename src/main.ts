@@ -14,7 +14,7 @@ import aiSearchRouter from './routers/ai_search';
 import appSearchRouter from './routers/app_search';
 import fdaRouter from './routers/fda';
 import weatherRouter from './routers/weather';
-import gifRouter from './routers/gif';
+import outfitRouter from './routers/outfit';
 
 dotenv.config();
 
@@ -49,7 +49,7 @@ app.use(`${apiPrefix}/ai`, aiSearchRouter);
 app.use(`${apiPrefix}/apps`, appSearchRouter);
 app.use(`${apiPrefix}/fda`, fdaRouter);
 app.use(`${apiPrefix}/weather`, weatherRouter);
-app.use(`${apiPrefix}/gif`, gifRouter);
+app.use(`${apiPrefix}/outfit`, outfitRouter);
 
 // Root endpoint
 app.get('/', (req, res) => {
@@ -82,7 +82,7 @@ app.get('/', (req, res) => {
             <li><code>/apps</code> - App store search</li>
             <li><code>/fda</code> - OpenFDA search</li>
             <li><code>/weather</code> - Open-Meteo weather</li>
-            <li><code>/gif</code> - AI-powered GIF search</li>
+            <li><code>/outfit</code> - AI Outfit Rating (Vision)</li>
           </ul>
         </div>
       </body>
