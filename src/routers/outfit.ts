@@ -24,7 +24,8 @@ router.post('/rate', async (req: Request, res: Response) => {
     if (image_url) {
       webhookLogger.log(`Fetching outfit image from URL: ${image_url}`, 'OUTFIT');
       const imageResp = await axios.get(image_url, { responseType: 'arraybuffer', timeout: 10000 });
-      mimeType = imageResp.headers['content-type'] || 'image/jpeg';
+      const contentType = imageResp.headers['content-type'];
+      mimeType = typeof contentType === 'string' ? contentType : 'image/jpeg';
       finalBase64 = Buffer.from(imageResp.data, 'binary').toString('base64');
     } else if (image_base64) {
       if (image_base64.startsWith('data:')) {
