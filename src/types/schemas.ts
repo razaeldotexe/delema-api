@@ -260,3 +260,27 @@ export const WeatherResponseSchema = z.object({
 });
 
 export type WeatherResponse = z.infer<typeof WeatherResponseSchema>;
+
+// --- GIF Search ---
+
+export const GifSearchRequestSchema = z.object({
+  query: z.string(),
+});
+
+export type GifSearchRequest = z.infer<typeof GifSearchRequestSchema>;
+
+export const GifTrendingRequestSchema = z.object({
+  limit: z.number().optional().default(10),
+});
+
+export type GifTrendingRequest = z.infer<typeof GifTrendingRequestSchema>;
+
+export const GifResultSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  original_url: z.string(),
+  preview_url: z.string(),
+  source_link: z.string(),
+});
+
+export type GifResult = z.infer<typeof GifResultSchema>;
