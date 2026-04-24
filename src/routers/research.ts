@@ -1,7 +1,9 @@
 import { Router, Request, Response } from 'express';
-import axios from 'axios';
 import wikipedia from 'wikipedia';
+import { search } from 'arxiv-client';
 import { SearchRequestSchema } from '../types/schemas';
+import { tryGemini, tryGroq, tryOpenRouter } from '../utils/ai_helper';
+import { webhookLogger } from '../utils/logger';
 
 const router = Router();
 
@@ -14,25 +16,74 @@ router.post('/arxiv', async (req: Request, res: Response) => {
     return res.status(422).json({ detail: validation.error.errors });
   }
 
-  const { query, limit = 10 } = validation.data;
+  const { query, limit } = validation.data;
 
   try {
-    // Using arXiv API directly via axios for better control
-    const url = `http://export.arxiv.org/api/query?search_query=all:${encodeURIComponent(query)}&max_results=${limit}`;
-    await axios.get(url);
+    const results = await search({
+      searchQueryParams: [
+        {
+          include: [{ name: query }],
+        },
+      ],
+      maxResults: limit,
+    });
 
-    // Note: arXiv returns XML. For simplicity in this conversion,
-    // we would normally use an XML parser.
-    // However, since we want to match the Python output:
-    // In a real scenario, we'd use 'fast-xml-parser' or similar.
-    // For now, I'll provide a placeholder or use a simple regex if needed,
-    // but ideally we should have an XML parser.
-    // Let's check if any XML parser is in package.json.
+    const papers = results.map((paper: any) => ({
+      title: paper.title,
+      authors: Array.isArray(paper.authors) ? paper.authors.map((a: any) => a.name) : [],
+      summary: paper.summary,
+      published: paper.published,
+      primary_category: paper.categories?.[0]?.term || 'unknown',
+      pdf_url: paper.links?.find((l: any) => l.type === 'pdf')?.href || '',
+      entry_id: paper.id,
+    }));
 
-    // If not, I'll just return a message or try to parse it simply.
-    // Actually, let's assume we want it to work.
+    let ai_summary: string | undefined = undefined;
 
-    return res.json({ message: 'ArXiv search implemented (XML parsing pending)', query, limit });
+    if (papers.length > 0) {
+      const providers = [
+        { name: 'Gemini', fn: tryGemini },
+        { name: 'Groq', fn: tryGroq },
+        { name: 'OpenRouter', fn: tryOpenRouter },
+      ];
+
+      const abstracts = papers
+        .slice(0, 10)
+        .map((p: any, i: number) => `[${i + 1}] ${p.summary.substring(0, 1500)}`)
+        .join('\n\n');
+
+      const prompt = `Gunakan informasi abstrak penelitian berikut untuk merangkum lanskap penelitian terkini tentang topik: "${query}". Berikan ringkasan yang ringkas dan informatif (maksimal 4-5 kalimat) dalam Bahasa Indonesia.\n\nAbstrak:\n${abstracts}`;
+
+      for (const provider of providers) {
+        try {
+          webhookLogger.log(
+            `Generating AI summary for arXiv query "${query}" using ${provider.name}...`,
+            'AI',
+          );
+          const response = await provider.fn(prompt);
+          if (response) {
+            ai_summary = response.trim();
+            webhookLogger.log(
+              `AI summary for arXiv generated successfully using ${provider.name}`,
+              'SUCCESS',
+            );
+            break;
+          }
+        } catch (error: any) {
+          webhookLogger.log(`Provider ${provider.name} failed for arXiv: ${error.message}`, 'WARN');
+        }
+      }
+    }
+
+    if (!ai_summary && papers.length > 0) {
+      webhookLogger.log(`All AI providers failed for arXiv summary of "${query}"`, 'ERROR');
+      ai_summary = 'Gagal menghasilkan ringkasan AI.';
+    }
+
+    return res.json({
+      results: papers,
+      ai_summary,
+    });
   } catch (error: any) {
     return res.status(500).json({ detail: error.message });
   }
@@ -53,10 +104,41 @@ router.post('/wikipedia', async (req: Request, res: Response) => {
     const page = await wikipedia.page(query);
     const summary = await page.summary();
 
+    let ai_summary: string | undefined = undefined;
+
+    // Force AI Summary
+    const providers = [
+      { name: 'Gemini', fn: tryGemini },
+      { name: 'Groq', fn: tryGroq },
+      { name: 'OpenRouter', fn: tryOpenRouter },
+    ];
+
+    const prompt = `Buatkan ringkasan singkat (maksimal 2-3 kalimat) dan langsung ke intinya untuk pertanyaan: "${query}". Gunakan HANYA informasi berikut dari Wikipedia: "${(summary.extract || '').substring(0, 1500)}". Jika informasinya tidak relevan, katakan saja "Konteks relevan tidak ditemukan di Wikipedia."`;
+
+    for (const provider of providers) {
+      try {
+        webhookLogger.log(`Generating AI summary for "${query}" using ${provider.name}...`, 'AI');
+        const response = await provider.fn(prompt);
+        if (response) {
+          ai_summary = response.trim();
+          webhookLogger.log(`AI summary generated successfully using ${provider.name}`, 'SUCCESS');
+          break;
+        }
+      } catch (error: any) {
+        webhookLogger.log(`Provider ${provider.name} failed: ${error.message}`, 'WARN');
+      }
+    }
+
+    if (!ai_summary) {
+      webhookLogger.log(`All AI providers failed for Wikipedia summary of "${query}"`, 'ERROR');
+      ai_summary = 'Gagal menghasilkan ringkasan AI.';
+    }
+
     return res.json({
       title: page.title,
-      summary: summary.extract.substring(0, 2000),
+      summary: (summary.extract || '').substring(0, 2000),
       fullurl: page.fullurl,
+      ai_summary,
     });
   } catch (error: any) {
     if (error.message.includes('not find')) {

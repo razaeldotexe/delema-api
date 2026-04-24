@@ -212,10 +212,18 @@ export const ArxivPaperSchema = z.object({
 
 export type ArxivPaper = z.infer<typeof ArxivPaperSchema>;
 
+export const ArxivResultSchema = z.object({
+  results: z.array(ArxivPaperSchema),
+  ai_summary: z.string().optional(),
+});
+
+export type ArxivResult = z.infer<typeof ArxivResultSchema>;
+
 export const WikipediaResultSchema = z.object({
   title: z.string(),
   summary: z.string(),
   fullurl: z.string(),
+  ai_summary: z.string().optional(),
 });
 
 export type WikipediaResult = z.infer<typeof WikipediaResultSchema>;
