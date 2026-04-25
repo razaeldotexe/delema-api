@@ -5,7 +5,6 @@ import { requestLogger, errorHandler } from './middleware/logger';
 import { webhookLogger } from './utils/logger';
 
 // Import Routers
-import rulesRouter from './routers/rules';
 import researchRouter from './routers/research';
 import integrationsRouter from './routers/integrations';
 import aiSearchRouter from './routers/ai_search';
@@ -36,7 +35,6 @@ webhookLogger.log('Delema API (Node.js) is starting up...', 'SYSTEM');
 
 // Routes
 const apiPrefix = '/api/v1';
-app.use(`${apiPrefix}/rules`, rulesRouter);
 app.use(`${apiPrefix}/research`, researchRouter);
 app.use(`${apiPrefix}/integrations`, integrationsRouter);
 app.use(`${apiPrefix}/ai`, aiSearchRouter);
@@ -291,11 +289,10 @@ app.get('/', (req, res) => {
       <script>
         const apiData = [
           {
-            category: "Research & Logic",
+            category: "Research",
             endpoints: [
               { path: "/research/arxiv", name: "ARXIV SEARCH", method: "POST", desc: "Cari publikasi ilmiah di ArXiv dengan ringkasan AI.", body: { query: "machine learning", limit: 5 } },
-              { path: "/research/wikipedia", name: "WIKIPEDIA", method: "POST", desc: "Ambil ringkasan ensiklopedia dan sintesis AI.", body: { query: "Node.js" } },
-              { path: "/rules/decision-tree", name: "DECISION TREE", method: "POST", desc: "Traverse pohon keputusan untuk menentukan hasil berdasarkan fakta.", body: { tree: { condition: { field: "age", operator: ">=", value: 18 }, true_node: "Adult", false_node: "Minor" }, facts: { age: 20 } } }
+              { path: "/research/wikipedia", name: "WIKIPEDIA", method: "POST", desc: "Ambil ringkasan ensiklopedia dan sintesis AI.", body: { query: "Node.js" } }
             ]
           },
           {
