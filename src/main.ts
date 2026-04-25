@@ -57,13 +57,13 @@ app.get('/', (req, res) => {
           --bg-card: #161b22;
           --bg-hover: #1c2128;
           --bg-input: #0d1117;
-          --primary: #c0392b;
+          --primary: #4f46e5; /* Indigo */
+          --secondary: #3b82f6; /* Blue */
+          --accent: #f59e0b; /* Yellow */
           --text-main: #d1d5db;
           --text-muted: #6b7280;
           --text-white: #ffffff;
           --border: #30363d;
-          --accent-teal: #2dd4bf;
-          --bg-teal: #0d4f4f;
         }
 
         body { 
@@ -94,7 +94,7 @@ app.get('/', (req, res) => {
         /* Hero */
         .hero { text-align: center; padding: 3rem 1rem 2rem; }
         .hero h1 { font-size: 2.5rem; margin: 0; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
-        .hero h1 .accent { color: var(--primary); }
+        .hero h1 .accent { color: var(--accent); }
         .hero .version { color: var(--text-muted); font-size: 1.25rem; font-weight: 400; margin-left: 0.5rem; }
         .hero p { color: var(--text-muted); font-size: 0.75rem; letter-spacing: 0.2em; margin-top: 1rem; text-transform: uppercase; }
 
@@ -109,7 +109,7 @@ app.get('/', (req, res) => {
           padding: 0.75rem 1rem;
           transition: border-color 0.2s;
         }
-        .search-box:focus-within { border-color: var(--text-muted); }
+        .search-box:focus-within { border-color: var(--primary); }
         .search-box i { color: var(--text-muted); margin-right: 0.75rem; }
         .search-box input { 
           background: transparent; 
@@ -161,9 +161,9 @@ app.get('/', (req, res) => {
           border-radius: 4px; 
           font-size: 0.7rem; 
           font-weight: 800; 
-          background: var(--bg-teal); 
-          color: var(--accent-teal); 
-          border: 1px solid rgba(45, 212, 191, 0.2); 
+          background: rgba(59, 130, 246, 0.1); 
+          color: var(--secondary); 
+          border: 1px solid rgba(59, 130, 246, 0.2); 
         }
         .endpoint-path { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 0.85rem; color: var(--text-main); }
         .endpoint-name { color: var(--text-muted); font-size: 0.75rem; }
