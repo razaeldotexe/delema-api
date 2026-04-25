@@ -1,6 +1,10 @@
 import axios from 'axios';
+import fs from 'fs';
+import path from 'path';
+import FormData from 'form-data';
 
 const WEBHOOK_URL = process.env.WEBHOOK_URL;
+const LOG_FILE_PATH = path.join(process.cwd(), 'console.log');
 
 const Colors = {
     Reset: '\x1b[0m',
@@ -41,9 +45,12 @@ class WebhookLogger {
     private delay = 3000;
     private messageId: string | null = null;
     private startTimestamp: number;
+    private uploadInterval = 30 * 60 * 1000; // 30 minutes
 
     private constructor() {
         this.startTimestamp = Math.floor(Date.now() / 1000);
+        this.initFileLogging();
+        this.startFileUploadLoop();
     }
 
     public static getInstance(): WebhookLogger {
@@ -51,6 +58,48 @@ class WebhookLogger {
             WebhookLogger.instance = new WebhookLogger();
         }
         return WebhookLogger.instance;
+    }
+
+    private initFileLogging() {
+        // Ensure file exists
+        if (!fs.existsSync(LOG_FILE_PATH)) {
+            fs.writeFileSync(LOG_FILE_PATH, `--- LOG START ${new Date().toISOString()} ---\n`);
+        }
+    }
+
+    private startFileUploadLoop() {
+        if (!WEBHOOK_URL) return;
+
+        setInterval(async () => {
+            await this.uploadLogFile();
+        }, this.uploadInterval);
+    }
+
+    public async uploadLogFile() {
+        if (!WEBHOOK_URL || !fs.existsSync(LOG_FILE_PATH)) return;
+
+        try {
+            const stats = fs.statSync(LOG_FILE_PATH);
+            if (stats.size < 10) return; // Don't upload empty/near-empty files
+
+            const form = new FormData();
+            form.append('content', `📊 **Log File Export** • <t:${Math.floor(Date.now() / 1000)}:R>\nSession started: <t:${this.startTimestamp}:f>`);
+            form.append('file', fs.createReadStream(LOG_FILE_PATH), {
+                filename: `console-${new Date().toISOString().split('T')[0]}.log`,
+                contentType: 'text/plain',
+            });
+
+            await axios.post(WEBHOOK_URL, form, {
+                headers: form.getHeaders(),
+            });
+
+            // Optional: Clear file after successful upload to prevent it from growing too large
+            // fs.writeFileSync(LOG_FILE_PATH, `--- LOG RESET ${new Date().toISOString()} ---\n`);
+            
+            this.success('Log file uploaded to Discord successfully.');
+        } catch (error: any) {
+            this.error(`Failed to upload log file: ${error.message}`);
+        }
     }
 
     private async sendToWebhook(): Promise<void> {
@@ -112,6 +161,7 @@ class WebhookLogger {
 
     public log(message: string, level: LogLevel = 'INFO'): void {
         const timestamp = new Date().toLocaleTimeString('en-GB', { hour12: false });
+        const dateStamp = new Date().toISOString().split('T')[0];
         
         // Console Output (Colored)
         const color = this.getLevelColor(level);
@@ -119,9 +169,18 @@ class WebhookLogger {
         const coloredLevel = `${color}${Colors.Bright}[${level}]${Colors.Reset}`;
         console.log(`${coloredTimestamp} ${coloredLevel} ${message}`);
 
-        // Webhook Output (Plain text for code block)
-        const formattedMessage = `[${timestamp}] [${level}] ${message}`;
-        this.queue.push(formattedMessage);
+        // Format for file and webhook
+        const formattedMessage = `[${dateStamp} ${timestamp}] [${level}] ${message}`;
+
+        // 1. Log to File
+        try {
+            fs.appendFileSync(LOG_FILE_PATH, formattedMessage + '\n');
+        } catch (err) {
+            console.error('Failed to write to log file:', err);
+        }
+
+        // 2. Queue for Webhook (Batched text)
+        this.queue.push(`[${timestamp}] [${level}] ${message}`);
 
         if (!this.isProcessing) {
             this.isProcessing = true;
