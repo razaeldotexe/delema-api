@@ -27,7 +27,7 @@ router.post('/arxiv', async (req: Request, res: Response) => {
       summary: paper.summary,
       published: paper.published,
       primary_category: paper.categories?.[0]?.term || 'unknown',
-      pdf_url: paper.links?.find((l: any) => l.type === 'pdf')?.href || '',
+      pdf_url: paper.links?.find((l: any) => l.type === 'pdf')?.href || paper.id || '',
       entry_id: paper.id,
     }));
 
