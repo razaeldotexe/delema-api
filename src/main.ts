@@ -59,206 +59,386 @@ app.get('/', (req, res) => {
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Delema API Dashboard</title>
+      <title>Delema API - Console V3</title>
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
       <style>
         :root {
-          --primary: #4f46e5;
-          --primary-hover: #4338ca;
-          --bg: #f8fafc;
-          --card-bg: #ffffff;
-          --text: #1e293b;
-          --text-light: #64748b;
-          --border: #e2e8f0;
-          --code-bg: #1e1e1e;
+          --bg-main: #0d1117;
+          --bg-card: #161b22;
+          --bg-hover: #1c2128;
+          --bg-input: #0d1117;
+          --primary: #c0392b;
+          --text-main: #d1d5db;
+          --text-muted: #6b7280;
+          --text-white: #ffffff;
+          --border: #30363d;
+          --accent-teal: #2dd4bf;
+          --bg-teal: #0d4f4f;
         }
-        body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; height: 100vh; overflow: hidden; }
-        
-        /* Sidebar */
-        .sidebar { width: 300px; background: var(--card-bg); border-right: 1px solid var(--border); overflow-y: auto; display: flex; flex-direction: column; }
-        .sidebar-header { padding: 1.5rem; border-bottom: 1px solid var(--border); }
-        .sidebar-header h1 { font-size: 1.25rem; margin: 0; color: var(--primary); display: flex; align-items: center; gap: 0.5rem; }
-        .endpoint-group { padding: 1rem; }
-        .group-title { font-size: 0.75rem; text-transform: uppercase; color: var(--text-light); font-weight: 700; letter-spacing: 0.05em; margin-bottom: 0.5rem; padding-left: 0.5rem; }
-        .endpoint-item { padding: 0.75rem; border-radius: 6px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 0.75rem; font-size: 0.9rem; color: var(--text); text-decoration: none; }
-        .endpoint-item:hover { background: #f1f5f9; }
-        .endpoint-item.active { background: #e0e7ff; color: var(--primary); font-weight: 600; }
-        .method { font-size: 0.7rem; font-weight: 800; padding: 2px 6px; border-radius: 4px; width: 45px; text-align: center; }
-        .method.post { background: #ecfdf5; color: #059669; }
-        .method.get { background: #eff6ff; color: #2563eb; }
 
-        /* Main Content */
-        .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-        .playground { flex: 1; padding: 2rem; overflow-y: auto; display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
-        
-        /* Tester Form */
-        .tester-section { display: flex; flex-direction: column; gap: 1.5rem; }
-        .input-group { display: flex; flex-direction: column; gap: 0.5rem; }
-        .input-group label { font-size: 0.875rem; font-weight: 600; color: var(--text-light); }
-        input, select, textarea { padding: 0.75rem; border: 1px solid var(--border); border-radius: 8px; font-family: inherit; font-size: 1rem; background: white; }
-        textarea { font-family: 'Fira Code', 'Courier New', monospace; resize: vertical; min-height: 200px; }
-        button { background: var(--primary); color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
-        button:hover { background: var(--primary-hover); }
-        button:disabled { background: var(--text-light); cursor: not-allowed; }
+        body { 
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+          background: var(--bg-main); 
+          color: var(--text-main); 
+          margin: 0; 
+          padding-bottom: 80px; 
+          -webkit-font-smoothing: antialiased;
+        }
 
-        /* Response View */
-        .response-section { display: flex; flex-direction: column; gap: 1rem; }
-        .response-header { display: flex; justify-content: space-between; align-items: center; }
-        .status-badge { padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; display: none; }
-        .status-success { background: #dcfce7; color: #166534; display: block; }
-        .status-error { background: #fee2e2; color: #991b1b; display: block; }
-        .response-body { background: var(--code-bg); color: #d4d4d4; padding: 1.5rem; border-radius: 12px; overflow: auto; font-family: 'Fira Code', monospace; font-size: 0.85rem; flex: 1; white-space: pre-wrap; box-shadow: inset 0 2px 10px rgba(0,0,0,0.2); }
+        /* Header */
+        header { 
+          display: flex; 
+          align-items: center; 
+          justify-content: space-between; 
+          padding: 1rem 1.5rem; 
+          border-bottom: 1px solid var(--border); 
+          background: var(--bg-main);
+          position: sticky;
+          top: 0;
+          z-index: 100;
+        }
+        .logo-container { display: flex; align-items: center; gap: 0.75rem; }
+        .logo-bar { width: 4px; height: 24px; background: var(--primary); border-radius: 2px; }
+        .logo-text { font-weight: 700; font-size: 1.1rem; color: var(--text-white); letter-spacing: 0.05em; }
+
+        /* Hero */
+        .hero { text-align: center; padding: 3rem 1rem 2rem; }
+        .hero h1 { font-size: 2.5rem; margin: 0; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
+        .hero h1 .accent { color: var(--primary); }
+        .hero .version { color: var(--text-muted); font-size: 1.25rem; font-weight: 400; margin-left: 0.5rem; }
+        .hero p { color: var(--text-muted); font-size: 0.75rem; letter-spacing: 0.2em; margin-top: 1rem; text-transform: uppercase; }
+
+        /* Search */
+        .search-container { max-width: 800px; margin: 0 auto 2rem; padding: 0 1rem; }
+        .search-box { 
+          background: var(--bg-card); 
+          border: 1px solid var(--border); 
+          border-radius: 8px; 
+          display: flex; 
+          align-items: center; 
+          padding: 0.75rem 1rem;
+          transition: border-color 0.2s;
+        }
+        .search-box:focus-within { border-color: var(--text-muted); }
+        .search-box i { color: var(--text-muted); margin-right: 0.75rem; }
+        .search-box input { 
+          background: transparent; 
+          border: none; 
+          color: var(--text-white); 
+          width: 100%; 
+          outline: none; 
+          font-size: 0.9rem;
+          letter-spacing: 0.05em;
+        }
+
+        /* Content */
+        .content { max-width: 800px; margin: 0 auto; padding: 0 1rem; }
+        .category-header { 
+          display: flex; 
+          align-items: center; 
+          justify-content: space-between; 
+          margin: 2rem 0 1rem; 
+          border-left: 4px solid var(--primary); 
+          padding-left: 0.75rem;
+        }
+        .category-header h2 { margin: 0; font-size: 1.1rem; color: var(--text-white); font-weight: 700; }
+        .category-header span { color: var(--text-muted); font-size: 0.75rem; font-weight: 600; }
+
+        /* Accordion Item */
+        .endpoint-card { 
+          background: var(--bg-card); 
+          border: 1px solid var(--border); 
+          border-radius: 8px; 
+          margin-bottom: 0.5rem; 
+          overflow: hidden;
+        }
+        .endpoint-trigger { 
+          width: 100%; 
+          padding: 1rem; 
+          display: flex; 
+          align-items: center; 
+          justify-content: space-between; 
+          background: none; 
+          border: none; 
+          cursor: pointer; 
+          text-align: left;
+          transition: background 0.2s;
+        }
+        .endpoint-trigger:hover { background: var(--bg-hover); }
+        .endpoint-info { display: flex; align-items: center; gap: 0.75rem; }
+        .method-badge { 
+          padding: 0.2rem 0.6rem; 
+          border-radius: 4px; 
+          font-size: 0.7rem; 
+          font-weight: 800; 
+          background: var(--bg-teal); 
+          color: var(--accent-teal); 
+          border: 1px solid rgba(45, 212, 191, 0.2); 
+        }
+        .endpoint-path { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 0.85rem; color: var(--text-main); }
+        .endpoint-name { color: var(--text-muted); font-size: 0.75rem; }
+
+        /* Expanded Content */
+        .endpoint-content { padding: 0 1rem 1rem; border-top: 1px solid var(--border); display: none; }
+        .endpoint-content.active { display: block; }
+        .endpoint-desc { color: var(--text-muted); font-size: 0.85rem; padding: 1rem 0; line-height: 1.5; }
         
-        @media (max-width: 1000px) { .playground { grid-template-columns: 1fr; } .sidebar { width: 80px; } .sidebar span, .sidebar .group-title { display: none; } }
+        .form-label { display: block; color: var(--text-muted); font-size: 0.7rem; font-weight: 700; margin-bottom: 0.5rem; letter-spacing: 0.1em; }
+        .input-field { 
+          width: 100%; 
+          background: var(--bg-input); 
+          border: 1px solid var(--border); 
+          border-radius: 6px; 
+          padding: 0.75rem; 
+          color: var(--text-main); 
+          font-family: monospace; 
+          font-size: 0.9rem; 
+          box-sizing: border-box;
+          outline: none;
+          margin-bottom: 1rem;
+        }
+        .input-field:focus { border-color: var(--text-muted); }
+        
+        .execute-btn { 
+          width: 100%; 
+          background: var(--primary); 
+          color: white; 
+          border: none; 
+          padding: 0.75rem; 
+          border-radius: 6px; 
+          font-weight: 700; 
+          font-size: 0.85rem; 
+          letter-spacing: 0.1em; 
+          cursor: pointer; 
+          transition: background 0.2s;
+        }
+        .execute-btn:hover { background: #a93226; }
+        .execute-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* Response Viewer */
+        .response-container { margin-top: 1.5rem; }
+        .response-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+        .response-status { font-size: 0.75rem; font-weight: 700; }
+        .status-success { color: #238636; }
+        .status-error { color: var(--primary); }
+        .response-body { 
+          background: #010409; 
+          color: #d1d5db; 
+          padding: 1rem; 
+          border-radius: 8px; 
+          font-family: monospace; 
+          font-size: 0.8rem; 
+          max-height: 400px; 
+          overflow: auto; 
+          white-space: pre-wrap;
+          border: 1px solid var(--border);
+        }
+
+        /* Bottom Nav */
+        .bottom-nav { 
+          position: fixed; 
+          bottom: 0; 
+          left: 0; 
+          right: 0; 
+          background: var(--bg-main); 
+          border-top: 1px solid var(--border); 
+          padding: 0.75rem 1rem; 
+          display: flex; 
+          justify-content: space-around; 
+          max-width: 800px; 
+          margin: 0 auto; 
+          z-index: 100;
+        }
+        .nav-item { color: var(--text-muted); font-size: 1.2rem; cursor: pointer; transition: color 0.2s; }
+        .nav-item:hover { color: var(--text-white); }
+        .nav-item.active { color: var(--text-white); }
+
+        @media (max-width: 640px) {
+          .hero h1 { font-size: 1.8rem; }
+          .endpoint-name { display: none; }
+        }
       </style>
     </head>
     <body>
-      <div class="sidebar">
-        <div class="sidebar-header">
-          <h1><i class="fas fa-brain"></i> <span>Delema API</span></h1>
+      <header>
+        <div class="logo-container">
+          <div class="logo-bar"></div>
+          <span class="logo-text">DELEMA API</span>
         </div>
-        
-        <div class="endpoint-group">
-          <div class="group-title">Research & Logic</div>
-          <div class="endpoint-item" onclick="setEndpoint('POST', '/research/arxiv', {query: 'artificial intelligence', limit: 3})">
-            <span class="method post">POST</span> <span>/arxiv</span>
-          </div>
-          <div class="endpoint-item" onclick="setEndpoint('POST', '/research/wikipedia', {query: 'Node.js'})">
-            <span class="method post">POST</span> <span>/wikipedia</span>
-          </div>
-          <div class="endpoint-item" onclick="setEndpoint('POST', '/recommendations/score', {items: [{id: 1, price: 100, rating: 4.5}, {id: 2, price: 50, rating: 4.0}], weights: {price: -0.5, rating: 2.0}})">
-            <span class="method post">POST</span> <span>/recommendations</span>
-          </div>
-        </div>
+        <div class="nav-item"><i class="fas fa-bars"></i></div>
+      </header>
 
-        <div class="endpoint-group">
-          <div class="group-title">AI & Search</div>
-          <div class="endpoint-item" onclick="setEndpoint('POST', '/ai/search-products', {query: 'gaming mouse', limit: 3})">
-            <span class="method post">POST</span> <span>/ai-products</span>
-          </div>
-          <div class="endpoint-item" onclick="setEndpoint('POST', '/apps/appstore', {query: 'discord', limit: 5})">
-            <span class="method post">POST</span> <span>/appstore</span>
-          </div>
-          <div class="endpoint-item" onclick="setEndpoint('POST', '/gif/search', {query: 'happy cat'})">
-            <span class="method post">POST</span> <span>/gif-search</span>
-          </div>
-        </div>
+      <section class="hero">
+        <h1>
+          <span class="text-white">API</span>
+          <span class="accent">CONSOLE</span>
+          <span class="version">V3</span>
+        </h1>
+        <p>Direct Endpoint Execution Environment</p>
+      </section>
 
-        <div class="endpoint-group">
-          <div class="group-title">Utilities</div>
-          <div class="endpoint-item" onclick="setEndpoint('GET', '/weather?city=Jakarta')">
-            <span class="method get">GET</span> <span>/weather</span>
-          </div>
-          <div class="endpoint-item" onclick="setEndpoint('POST', '/routing/ab-test', {user_id: 'user_123', variants: [{name: 'v1', weight: 50}, {name: 'v2', weight: 50}]})">
-            <span class="method post">POST</span> <span>/ab-test</span>
-          </div>
+      <div class="search-container">
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input type="text" id="endpoint-search" placeholder="FILTER ENDPOINTS..." onkeyup="filterEndpoints()">
         </div>
       </div>
 
-      <div class="main">
-        <div class="playground">
-          <div class="tester-section">
-            <h2 style="margin-top:0">API Playground</h2>
-            
-            <div class="input-group">
-              <label>Target URL</label>
-              <div style="display:flex; gap:0.5rem">
-                <select id="method" style="width:100px">
-                  <option value="GET">GET</option>
-                  <option value="POST">POST</option>
-                </select>
-                <input type="text" id="url" value="/api/v1/research/arxiv" style="flex:1">
-              </div>
-            </div>
+      <main class="content" id="api-list">
+        <!-- Categories will be injected here -->
+      </main>
 
-            <div class="input-group" id="body-group">
-              <label>JSON Request Body</label>
-              <textarea id="body">{
-  "query": "artificial intelligence",
-  "limit": 3
-}</textarea>
-            </div>
-
-            <button id="send-btn" onclick="sendRequest()">
-              <i class="fas fa-paper-plane"></i> Send Request
-            </button>
-          </div>
-
-          <div class="response-section">
-            <div class="response-header">
-              <h2 style="margin:0">Response</h2>
-              <div id="status" class="status-badge">200 OK</div>
-            </div>
-            <div id="response" class="response-body">Click 'Send Request' to see results...</div>
-          </div>
-        </div>
-      </div>
+      <nav class="bottom-nav">
+        <div class="nav-item active"><i class="fas fa-home"></i></div>
+        <div class="nav-item"><i class="fas fa-bookmark"></i></div>
+        <div class="nav-item"><i class="fas fa-search"></i></div>
+        <div class="nav-item"><i class="fas fa-history"></i></div>
+        <div class="nav-item"><i class="fas fa-user"></i></div>
+      </nav>
 
       <script>
-        function setEndpoint(method, path, defaultBody) {
-          document.getElementById('method').value = method;
-          document.getElementById('url').value = '/api/v1' + path;
-          
-          const bodyGroup = document.getElementById('body-group');
-          if (method === 'GET') {
-            bodyGroup.style.display = 'none';
-          } else {
-            bodyGroup.style.display = 'flex';
-            document.getElementById('body').value = JSON.stringify(defaultBody, null, 2);
+        const apiData = [
+          {
+            category: "Research & Logic",
+            endpoints: [
+              { path: "/research/arxiv", name: "ARXIV SEARCH", method: "POST", desc: "Cari publikasi ilmiah di ArXiv dengan ringkasan AI.", body: { query: "machine learning", limit: 5 } },
+              { path: "/research/wikipedia", name: "WIKIPEDIA", method: "POST", desc: "Ambil ringkasan ensiklopedia dan sintesis AI.", body: { query: "Node.js" } },
+              { path: "/recommendations/score", name: "WEIGHTED SCORE", method: "POST", desc: "Hitung skor berbobot untuk daftar item.", body: { items: [{id: 1, price: 100}, {id: 2, price: 50}], weights: {price: -1} } }
+            ]
+          },
+          {
+            category: "AI & Smart Search",
+            endpoints: [
+              { path: "/ai/search-products", name: "AI PRODUCT SEARCH", method: "POST", desc: "Rekomendasi produk pintar berbasis AI.", body: { query: "macbook air", limit: 3 } },
+              { path: "/ai/app-availability", name: "APP CHECKER", method: "POST", desc: "Cek ketersediaan aplikasi di berbagai platform.", body: { query: "Genshin Impact" } },
+              { path: "/outfit/rate", name: "OUTFIT RATER", method: "POST", desc: "Rating pakaian menggunakan Vision AI.", body: { image_url: "https://example.com/outfit.jpg", context: "casual" } }
+            ]
+          },
+          {
+            category: "Apps & Stores",
+            endpoints: [
+              { path: "/apps/appstore", name: "APPLE APP STORE", method: "POST", desc: "Cari aplikasi di iOS App Store.", body: { query: "discord" } },
+              { path: "/apps/fdroid", name: "F-DROID", method: "POST", desc: "Cari aplikasi open source di F-Droid.", body: { query: "browser" } },
+              { path: "/apps/trending", name: "TRENDING APPS", method: "POST", desc: "Dapatkan aplikasi populer dari GitHub/F-Droid.", body: { source: "github", limit: 10 } }
+            ]
+          },
+          {
+            category: "Utilities",
+            endpoints: [
+              { path: "/weather", name: "WEATHER", method: "GET", desc: "Dapatkan data cuaca real-time.", body: null, queryParams: "city=Jakarta" },
+              { path: "/routing/ab-test", name: "A/B TESTING", method: "POST", desc: "Assignment varian user secara deterministik.", body: { user_id: "u123", variants: [{name: "A", weight: 50}, {name: "B", weight: 50}] } }
+            ]
           }
+        ];
 
-          // Update active state in sidebar
-          document.querySelectorAll('.endpoint-item').forEach(el => {
-            el.classList.remove('active');
-            if (el.textContent.includes(path.split('/')[path.split('/').length - 1])) {
-              el.classList.add('active');
-            }
+        function renderEndpoints() {
+          const container = document.getElementById('api-list');
+          container.innerHTML = apiData.map(cat => \`
+            <div class="category-block">
+              <div class="category-header">
+                <h2>\${cat.category}</h2>
+                <span>\${cat.endpoints.length} ENDPOINTS</span>
+              </div>
+              <div class="endpoints-group">
+                \${cat.endpoints.map(ep => \`
+                  <div class="endpoint-card" data-search="\${ep.path} \${ep.name}">
+                    <button class="endpoint-trigger" onclick="toggleAccordion(this)">
+                      <div class="endpoint-info">
+                        <span class="method-badge">\${ep.method}</span>
+                        <span class="endpoint-path">\${ep.path}</span>
+                        <span class="endpoint-name">\${ep.name}</span>
+                      </div>
+                      <i class="fas fa-chevron-down text-muted"></i>
+                    </button>
+                    <div class="endpoint-content">
+                      <p class="endpoint-desc">\${ep.desc}</p>
+                      <span class="form-label">REQUEST \${ep.method === 'GET' ? 'PARAMS' : 'BODY'}</span>
+                      <textarea id="input-\${ep.path}" class="input-field" rows="6">\${
+                        ep.method === 'GET' ? ep.queryParams : JSON.stringify(ep.body, null, 2)
+                      }</textarea>
+                      <button class="execute-btn" onclick="executeRequest('\${ep.method}', '\${ep.path}')">
+                        EXECUTE REQUEST
+                      </button>
+                      <div id="res-container-\${ep.path}" class="response-container" style="display:none">
+                        <div class="response-header">
+                          <span class="form-label">RESPONSE</span>
+                          <span id="status-\${ep.path}" class="response-status"></span>
+                        </div>
+                        <div id="body-\${ep.path}" class="response-body"></div>
+                      </div>
+                    </div>
+                  </div>
+                \`).join('')}
+              </div>
+            </div>
+          \`).join('');
+        }
+
+        function toggleAccordion(btn) {
+          const card = btn.parentElement;
+          const content = card.querySelector('.endpoint-content');
+          const icon = btn.querySelector('.fa-chevron-down');
+          
+          const isActive = content.classList.contains('active');
+          
+          // Close all others
+          document.querySelectorAll('.endpoint-content').forEach(el => el.classList.remove('active'));
+          document.querySelectorAll('.fa-chevron-down').forEach(el => el.style.transform = 'rotate(0deg)');
+          
+          if (!isActive) {
+            content.classList.add('active');
+            icon.style.transform = 'rotate(180deg)';
+          }
+        }
+
+        function filterEndpoints() {
+          const q = document.getElementById('endpoint-search').value.toLowerCase();
+          document.querySelectorAll('.endpoint-card').forEach(card => {
+            const text = card.getAttribute('data-search').toLowerCase();
+            card.style.display = text.includes(q) ? 'block' : 'none';
+          });
+          // Hide empty categories
+          document.querySelectorAll('.category-block').forEach(cat => {
+            const hasVisible = Array.from(cat.querySelectorAll('.endpoint-card')).some(c => c.style.display !== 'none');
+            cat.style.display = hasVisible ? 'block' : 'none';
           });
         }
 
-        async function sendRequest() {
-          const method = document.getElementById('method').value;
-          const url = document.getElementById('url').value;
-          const bodyContent = document.getElementById('body').value;
-          const responseEl = document.getElementById('response');
-          const statusEl = document.getElementById('status');
-          const btn = document.getElementById('send-btn');
-
-          responseEl.textContent = 'Loading...';
-          statusEl.className = 'status-badge';
-          btn.disabled = true;
-
+        async function executeRequest(method, path) {
+          const input = document.getElementById('input-' + path).value;
+          const resContainer = document.getElementById('res-container-' + path);
+          const resBody = document.getElementById('body-' + path);
+          const resStatus = document.getElementById('status-' + path);
+          
+          resContainer.style.display = 'block';
+          resBody.textContent = 'Loading...';
+          
           try {
-            const options = {
-              method: method,
-              headers: { 'Content-Type': 'application/json' }
-            };
-
-            if (method === 'POST') {
-              options.body = bodyContent;
+            let url = '/api/v1' + path;
+            const options = { method, headers: { 'Content-Type': 'application/json' } };
+            
+            if (method === 'GET') {
+              url += '?' + input;
+            } else {
+              options.body = input;
             }
 
             const start = Date.now();
             const res = await fetch(url, options);
             const duration = Date.now() - start;
             const data = await res.json();
-
-            statusEl.textContent = res.status + ' ' + res.statusText + ' (' + duration + 'ms)';
-            statusEl.classList.add(res.ok ? 'status-success' : 'status-error');
-            responseEl.textContent = JSON.stringify(data, null, 2);
+            
+            resStatus.textContent = \`\${res.status} \${res.statusText} (\${duration}ms)\`;
+            resStatus.className = 'response-status ' + (res.ok ? 'status-success' : 'status-error');
+            resBody.textContent = JSON.stringify(data, null, 2);
           } catch (err) {
-            statusEl.textContent = 'Error';
-            statusEl.classList.add('status-error');
-            responseEl.textContent = 'Failed to connect: ' + err.message;
-          } finally {
-            btn.disabled = false;
+            resStatus.textContent = 'ERROR';
+            resStatus.className = 'response-status status-error';
+            resBody.textContent = 'Connection failed: ' + err.message;
           }
         }
 
-        // Initialize with POST body visibility
-        document.getElementById('method').addEventListener('change', (e) => {
-          document.getElementById('body-group').style.display = e.target.value === 'POST' ? 'flex' : 'none';
-        });
+        renderEndpoints();
       </script>
     </body>
     </html>
