@@ -1,24 +1,9 @@
 import express, { Router } from 'express';
-import { EvaluateRequestSchema, DecisionTreeRequestSchema } from '../types/schemas';
-import { evaluateGroup, traverseTree } from '../logic/rules_engine';
+import { DecisionTreeRequestSchema } from '../types/schemas';
+import { traverseTree } from '../logic/rules_engine';
 import { webhookLogger } from '../utils/logger';
 
 const router: Router = express.Router();
-
-/**
- * Evaluate a set of rules against provided facts.
- */
-router.post('/evaluate', (req, res) => {
-  try {
-    const data = EvaluateRequestSchema.parse(req.body);
-    const matched = evaluateGroup(data.ruleset, data.facts);
-    webhookLogger.log(`Evaluated ruleset: matched=${matched}`);
-    res.json({ matched });
-  } catch (error: any) {
-    webhookLogger.log(`Error evaluating rules: ${error.message}`, 'ERROR');
-    res.status(400).json({ detail: error.errors || error.message });
-  }
-});
 
 /**
  * Evaluate a decision tree against provided facts.

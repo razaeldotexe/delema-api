@@ -297,7 +297,7 @@ app.get('/', (req, res) => {
             endpoints: [
               { path: "/research/arxiv", name: "ARXIV SEARCH", method: "POST", desc: "Cari publikasi ilmiah di ArXiv dengan ringkasan AI.", body: { query: "machine learning", limit: 5 } },
               { path: "/research/wikipedia", name: "WIKIPEDIA", method: "POST", desc: "Ambil ringkasan ensiklopedia dan sintesis AI.", body: { query: "Node.js" } },
-              { path: "/rules/evaluate", name: "RULES ENGINE", method: "POST", desc: "Evaluasi ruleset kompleks terhadap data fakta.", body: { ruleset: { condition: "AND", rules: [{ field: "age", operator: ">=", value: 18 }] }, facts: { age: 20 } } }
+              { path: "/rules/decision-tree", name: "DECISION TREE", method: "POST", desc: "Traverse pohon keputusan untuk menentukan hasil berdasarkan fakta.", body: { tree: { condition: { field: "age", operator: ">=", value: 18 }, true_node: "Adult", false_node: "Minor" }, facts: { age: 20 } } }
             ]
           },
           {
