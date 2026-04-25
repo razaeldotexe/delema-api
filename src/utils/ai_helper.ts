@@ -1,12 +1,19 @@
 import axios from 'axios';
 import { webhookLogger } from './logger';
 
-export const GEMINI_MODELS = ['gemini-2.0-flash', 'gemini-2.0-flash-lite-preview-02-05'];
-export const GEMINI_VISION_MODELS = ['gemini-2.0-flash', 'gemini-2.5-flash'];
-export const GROQ_MODELS = ['llama-3.3-70b-versatile', 'mixtral-8x7b-32768'];
+export const GEMINI_MODELS = [
+  'gemini-3.1-flash-preview',
+  'gemini-3.1-flash-lite-preview',
+  'gemini-2.5-flash',
+  'gemini-2.5-flash-lite',
+  'gemini-1.5-flash',
+];
+export const GEMINI_VISION_MODELS = ['gemini-3.1-flash-preview', 'gemini-2.5-flash'];
+export const GROQ_MODELS = ['llama-4-maverick-400b-128e', 'llama-4-scout-109b-16e'];
 export const OPENROUTER_MODELS = [
-  'google/gemini-2.0-flash-001',
-  'meta-llama/llama-3.3-70b-instruct',
+  'google/gemini-3.1-flash',
+  'meta-llama/llama-4-maverick',
+  'meta-llama/llama-4-scout',
 ];
 
 export async function tryGemini(prompt: string): Promise<string> {

@@ -2,13 +2,18 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import request from 'supertest';
 import app from '../src/main';
 import * as aiHelper from '../src/utils/ai_helper';
-import { search as arxivSearch } from 'arxiv-client';
-import wikipedia from 'wikipedia';
+import axios from 'axios';
+import arxivClient from 'arxiv-client';
 
+vi.mock('axios');
 vi.mock('arxiv-client', () => ({
-  search: vi.fn(),
+  default: {
+    query: vi.fn().mockReturnThis(),
+    maxResults: vi.fn().mockReturnThis(),
+    execute: vi.fn(),
+  },
+  all: vi.fn((q) => q),
 }));
-vi.mock('wikipedia');
 vi.mock('../src/utils/ai_helper');
 
 describe('Research API', () => {
@@ -30,7 +35,7 @@ describe('Research API', () => {
         },
       ];
 
-      (arxivSearch as any).mockResolvedValue(mockPapers);
+      (arxivClient.execute as any).mockResolvedValue(mockPapers);
       (aiHelper.tryGemini as any).mockResolvedValue('Ringkasan AI dalam Bahasa Indonesia.');
 
       const response = await request(app)
@@ -41,11 +46,11 @@ describe('Research API', () => {
       expect(response.body.results).toHaveLength(1);
       expect(response.body.results[0].title).toBe('Test Paper 1');
       expect(response.body.ai_summary).toBe('Ringkasan AI dalam Bahasa Indonesia.');
-      expect(arxivSearch).toHaveBeenCalled();
+      expect(arxivClient.execute).toHaveBeenCalled();
     });
 
     it('should handle no results from arXiv', async () => {
-      (arxivSearch as any).mockResolvedValue([]);
+      (arxivClient.execute as any).mockResolvedValue([]);
 
       const response = await request(app)
         .post('/api/delema/v1/research/arxiv')
@@ -57,9 +62,7 @@ describe('Research API', () => {
     });
 
     it('should return 422 for missing query', async () => {
-      const response = await request(app)
-        .post('/api/delema/v1/research/arxiv')
-        .send({ limit: 5 });
+      const response = await request(app).post('/api/delema/v1/research/arxiv').send({ limit: 5 });
 
       expect(response.status).toBe(422);
     });
@@ -77,7 +80,7 @@ describe('Research API', () => {
         },
       ];
 
-      (arxivSearch as any).mockResolvedValue(mockPapers);
+      (arxivClient.execute as any).mockResolvedValue(mockPapers);
       (aiHelper.tryGemini as any).mockRejectedValue(new Error('Gemini failed'));
       (aiHelper.tryGroq as any).mockRejectedValue(new Error('Groq failed'));
       (aiHelper.tryOpenRouter as any).mockRejectedValue(new Error('OpenRouter failed'));
@@ -93,13 +96,13 @@ describe('Research API', () => {
 
   describe('POST /api/delema/v1/research/wikipedia', () => {
     it('should return wikipedia summary and AI summary', async () => {
-      const mockPage = {
+      const mockSummary = {
         title: 'Test Topic',
-        fullurl: 'https://en.wikipedia.org/wiki/Test_Topic',
-        summary: vi.fn().mockResolvedValue({ extract: 'Wikipedia extract content.' }),
+        extract: 'Wikipedia extract content.',
+        content_urls: { desktop: { page: 'https://en.wikipedia.org/wiki/Test_Topic' } },
       };
 
-      (wikipedia.page as any).mockResolvedValue(mockPage);
+      (axios.get as any).mockResolvedValue({ data: mockSummary });
       (aiHelper.tryGemini as any).mockResolvedValue('Ringkasan AI Wikipedia.');
 
       const response = await request(app)
@@ -113,7 +116,7 @@ describe('Research API', () => {
     });
 
     it('should return 404 when page is not found', async () => {
-      (wikipedia.page as any).mockRejectedValue(new Error('Could not find page'));
+      (axios.get as any).mockRejectedValue({ response: { status: 404 } });
 
       const response = await request(app)
         .post('/api/delema/v1/research/wikipedia')
@@ -124,21 +127,19 @@ describe('Research API', () => {
     });
 
     it('should return 422 for missing query', async () => {
-      const response = await request(app)
-        .post('/api/delema/v1/research/wikipedia')
-        .send({});
+      const response = await request(app).post('/api/delema/v1/research/wikipedia').send({});
 
       expect(response.status).toBe(422);
     });
 
     it('should handle AI provider failures for Wikipedia', async () => {
-      const mockPage = {
+      const mockSummary = {
         title: 'Test Topic',
-        fullurl: 'https://en.wikipedia.org/wiki/Test_Topic',
-        summary: vi.fn().mockResolvedValue({ extract: 'Wikipedia extract content.' }),
+        extract: 'Wikipedia extract content.',
+        content_urls: { desktop: { page: 'https://en.wikipedia.org/wiki/Test_Topic' } },
       };
 
-      (wikipedia.page as any).mockResolvedValue(mockPage);
+      (axios.get as any).mockResolvedValue({ data: mockSummary });
       (aiHelper.tryGemini as any).mockRejectedValue(new Error('Gemini failed'));
       (aiHelper.tryGroq as any).mockRejectedValue(new Error('Groq failed'));
       (aiHelper.tryOpenRouter as any).mockRejectedValue(new Error('OpenRouter failed'));
