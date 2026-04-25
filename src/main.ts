@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import { requestLogger, errorHandler } from './middleware/logger';
 import { webhookLogger } from './utils/logger';
 import { rateLimiter } from './middleware/rateLimiter';
+import { initDB } from './utils/db';
 
 // Import Routers
 import researchRouter from './routers/research';
@@ -17,6 +18,9 @@ dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 8000;
+
+// Initialize AI Memory
+initDB();
 
 // Basic CORS Middleware
 app.use((req, res, next) => {

@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { webhookLogger } from './logger';
+import { getFromMemory, saveToMemory } from './db';
 
 export const GEMINI_MODELS = [
   'gemini-3.1-flash-preview',
@@ -148,6 +149,12 @@ export async function tryOpenRouter(prompt: string): Promise<string> {
 }
 
 export async function tryAllProviders(prompt: string): Promise<string> {
+  // 1. Check AI Memory first
+  const cachedResponse = await getFromMemory(prompt);
+  if (cachedResponse) {
+    return cachedResponse;
+  }
+
   const providers = [
     { name: 'Gemini', fn: tryGemini },
     { name: 'Groq', fn: tryGroq },
@@ -157,7 +164,11 @@ export async function tryAllProviders(prompt: string): Promise<string> {
   for (const provider of providers) {
     try {
       const result = await provider.fn(prompt);
-      if (result) return result;
+      if (result) {
+        // 2. Save result to memory for next time
+        await saveToMemory(prompt, result);
+        return result;
+      }
     } catch (error: any) {
       webhookLogger.warn(`${provider.name} provider exhausted: ${error.message}`);
     }
