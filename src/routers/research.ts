@@ -1,12 +1,9 @@
 import { Router, Request, Response } from 'express';
-import wikipedia from 'wikipedia';
+import axios from 'axios';
 import arxivClient, { all } from 'arxiv-client';
 import { SearchRequestSchema } from '../types/schemas';
 import { tryGemini, tryGroq, tryOpenRouter } from '../utils/ai_helper';
 import { webhookLogger } from '../utils/logger';
-
-// Set User-Agent for Wikipedia API to avoid 403 Forbidden errors
-wikipedia.setUserAgent('DelemaAPI/1.0 (https://delema.razael-fox.my.id; contact@razael-fox.my.id)');
 
 const router = Router();
 
@@ -100,8 +97,34 @@ router.post('/wikipedia', async (req: Request, res: Response) => {
   const { query } = validation.data;
 
   try {
-    const page = await wikipedia.page(query);
-    const summary = await page.summary();
+    const userAgent = 'DelemaAPI/1.0 (https://delema.razael-fox.my.id; contact@razael-fox.my.id)';
+    let summaryData: any = null;
+    let usedLang = 'en';
+
+    // Try English first
+    try {
+      const enUrl = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(query)}`;
+      const response = await axios.get(enUrl, { headers: { 'User-Agent': userAgent }, timeout: 10000 });
+      summaryData = response.data;
+    } catch (e: any) {
+      // If 404 on EN, try ID
+      if (e.response?.status === 404) {
+        try {
+          const idUrl = `https://id.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(query)}`;
+          const response = await axios.get(idUrl, { headers: { 'User-Agent': userAgent }, timeout: 10000 });
+          summaryData = response.data;
+          usedLang = 'id';
+        } catch (idError) {
+          throw e; // throw original EN 404 if ID also fails
+        }
+      } else {
+        throw e;
+      }
+    }
+
+    if (!summaryData || summaryData.type === 'disambiguation') {
+      return res.status(404).json({ detail: 'Page not found or is a disambiguation page' });
+    }
 
     let ai_summary: string | undefined = undefined;
 
@@ -112,7 +135,7 @@ router.post('/wikipedia', async (req: Request, res: Response) => {
       { name: 'OpenRouter', fn: tryOpenRouter },
     ];
 
-    const prompt = `Buatkan ringkasan singkat (maksimal 2-3 kalimat) dan langsung ke intinya untuk pertanyaan: "${query}". Gunakan HANYA informasi berikut dari Wikipedia: "${(summary.extract || '').substring(0, 1500)}". Jika informasinya tidak relevan, katakan saja "Konteks relevan tidak ditemukan di Wikipedia."`;
+    const prompt = `Buatkan ringkasan singkat (maksimal 2-3 kalimat) dan langsung ke intinya untuk pertanyaan: "${query}". Gunakan HANYA informasi berikut dari Wikipedia: "${(summaryData.extract || '').substring(0, 1500)}". Jika informasinya tidak relevan, katakan saja "Konteks relevan tidak ditemukan di Wikipedia."`;
 
     for (const provider of providers) {
       try {
@@ -134,13 +157,13 @@ router.post('/wikipedia', async (req: Request, res: Response) => {
     }
 
     return res.json({
-      title: page.title,
-      summary: (summary.extract || '').substring(0, 2000),
-      fullurl: page.fullurl,
+      title: summaryData.title,
+      summary: (summaryData.extract || '').substring(0, 2000),
+      fullurl: summaryData.content_urls?.desktop?.page || `https://${usedLang}.wikipedia.org/wiki/${encodeURIComponent(summaryData.title)}`,
       ai_summary,
     });
   } catch (error: any) {
-    if (error.message.includes('not find')) {
+    if (error.response?.status === 404) {
       return res.status(404).json({ detail: 'Page not found' });
     }
     return res.status(500).json({ detail: error.message });
