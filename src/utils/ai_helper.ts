@@ -146,3 +146,22 @@ export async function tryOpenRouter(prompt: string): Promise<string> {
   }
   throw new Error('All OpenRouter models failed');
 }
+
+export async function tryAllProviders(prompt: string): Promise<string> {
+  const providers = [
+    { name: 'Gemini', fn: tryGemini },
+    { name: 'Groq', fn: tryGroq },
+    { name: 'OpenRouter', fn: tryOpenRouter },
+  ];
+
+  for (const provider of providers) {
+    try {
+      const result = await provider.fn(prompt);
+      if (result) return result;
+    } catch (error: any) {
+      webhookLogger.log(`${provider.name} provider exhausted: ${error.message}`, 'WARN');
+    }
+  }
+
+  throw new Error('All AI providers failed');
+}

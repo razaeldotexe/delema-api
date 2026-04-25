@@ -1,11 +1,11 @@
 import { Router } from 'express';
-import { 
-  CodeExplainSchema, 
-  CodeDebugSchema, 
-  CodeGenerateSchema, 
-  CodeRefactorSchema 
+import {
+  CodeExplainSchema,
+  CodeDebugSchema,
+  CodeGenerateSchema,
+  CodeRefactorSchema,
 } from '../types/schemas';
-import { tryGemini } from '../utils/ai_helper';
+import { tryAllProviders } from '../utils/ai_helper';
 
 const router = Router();
 
@@ -18,8 +18,8 @@ router.post('/explain', async (req, res) => {
   const prompt = `Explain the following ${language || ''} code in a clear and concise way. ${
     context ? `Additional Context: ${context}` : ''
   }\n\nCode:\n\`\`\`\n${code}\n\`\`\``;
-  
-  const explanation = await tryGemini(prompt);
+
+  const explanation = await tryAllProviders(prompt);
   res.json({ explanation });
 });
 
@@ -32,8 +32,8 @@ router.post('/debug', async (req, res) => {
   const prompt = `Identify and fix the bug in the following ${language || ''} code. ${
     error ? `Reported Error: ${error}` : ''
   }\n\nCode:\n\`\`\`\n${code}\n\`\`\``;
-  
-  const fix = await tryGemini(prompt);
+
+  const fix = await tryAllProviders(prompt);
   res.json({ fix });
 });
 
@@ -46,8 +46,8 @@ router.post('/generate', async (req, res) => {
   const prompt = `Generate ${language} code ${
     framework ? `using the ${framework} framework` : ''
   } for the following requirement:\n${userPrompt}\n\nProvide only the code block and a brief explanation.`;
-  
-  const code = await tryGemini(prompt);
+
+  const code = await tryAllProviders(prompt);
   res.json({ code });
 });
 
@@ -58,10 +58,12 @@ router.post('/generate', async (req, res) => {
 router.post('/refactor', async (req, res) => {
   const { code, instruction, language } = CodeRefactorSchema.parse(req.body);
   const prompt = `Refactor the following ${language || ''} code. ${
-    instruction ? `Specific Instruction: ${instruction}` : 'Focus on improving readability and performance.'
+    instruction
+      ? `Specific Instruction: ${instruction}`
+      : 'Focus on improving readability and performance.'
   }\n\nCode:\n\`\`\`\n${code}\n\`\`\``;
-  
-  const refactoredCode = await tryGemini(prompt);
+
+  const refactoredCode = await tryAllProviders(prompt);
   res.json({ refactoredCode });
 });
 

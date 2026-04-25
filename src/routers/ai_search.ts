@@ -2,7 +2,7 @@ import { Router, Request, Response } from 'express';
 import { webhookLogger } from '../utils/logger';
 import { fetchRealProducts } from '../utils/product_fetcher';
 import { ProductSearchRequestSchema } from '../types/schemas';
-import { tryGemini, tryGroq, tryOpenRouter } from '../utils/ai_helper';
+import { tryAllProviders } from '../utils/ai_helper';
 
 const router = Router();
 
@@ -47,36 +47,29 @@ router.post('/search', async (req: Request, res: Response) => {
     Do not include markdown or introductory text.
     `;
 
-    const providers = [
-      { name: 'Gemini', fn: tryGemini },
-      { name: 'Groq', fn: tryGroq },
-      { name: 'OpenRouter', fn: tryOpenRouter },
-    ];
+    try {
+      webhookLogger.log(`Processing hybrid search using multi-provider rotation...`, 'AI');
+      const rawResponse = await tryAllProviders(prompt);
 
-    for (const provider of providers) {
-      try {
-        webhookLogger.log(`Processing hybrid search with ${provider.name}...`, 'AI');
-        const rawResponse = await provider.fn(prompt);
+      const cleanJson = rawResponse
+        .trim()
+        .replace(/```json/g, '')
+        .replace(/```/g, '')
+        .trim();
+      const products = JSON.parse(cleanJson);
 
-        const cleanJson = rawResponse
-          .trim()
-          .replace(/```json/g, '')
-          .replace(/```/g, '')
-          .trim();
-        const products = JSON.parse(cleanJson);
-
-        if (Array.isArray(products)) {
-          webhookLogger.log(`Hybrid search successful using ${provider.name}`, 'SUCCESS');
-          return res.json(products.slice(0, limit));
-        }
-      } catch (error: any) {
-        webhookLogger.log(`Provider ${provider.name} failed: ${error.message}`, 'WARN');
+      if (Array.isArray(products)) {
+        webhookLogger.log(`Hybrid search successful`, 'SUCCESS');
+        return res.json(products.slice(0, limit));
       }
+    } catch (error: any) {
+      webhookLogger.log(`All AI providers failed: ${error.message}`, 'ERROR');
+      return res
+        .status(503)
+        .json({ detail: 'All AI providers failed to process the hybrid search request.' });
     }
 
-    return res
-      .status(503)
-      .json({ detail: 'All AI providers failed to process the hybrid search request.' });
+    return res.status(500).json({ detail: 'Failed to parse AI response' });
   } catch (error: any) {
     return res.status(500).json({ detail: error.message });
   }

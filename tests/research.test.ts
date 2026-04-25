@@ -36,7 +36,7 @@ describe('Research API', () => {
       ];
 
       (arxivClient.execute as any).mockResolvedValue(mockPapers);
-      (aiHelper.tryGemini as any).mockResolvedValue('Ringkasan AI dalam Bahasa Indonesia.');
+      (aiHelper.tryAllProviders as any).mockResolvedValue('Ringkasan AI dalam Bahasa Indonesia.');
 
       const response = await request(app)
         .post('/api/delema/v1/research/arxiv')
@@ -81,9 +81,7 @@ describe('Research API', () => {
       ];
 
       (arxivClient.execute as any).mockResolvedValue(mockPapers);
-      (aiHelper.tryGemini as any).mockRejectedValue(new Error('Gemini failed'));
-      (aiHelper.tryGroq as any).mockRejectedValue(new Error('Groq failed'));
-      (aiHelper.tryOpenRouter as any).mockRejectedValue(new Error('OpenRouter failed'));
+      (aiHelper.tryAllProviders as any).mockRejectedValue(new Error('All providers failed'));
 
       const response = await request(app)
         .post('/api/delema/v1/research/arxiv')
@@ -103,7 +101,7 @@ describe('Research API', () => {
       };
 
       (axios.get as any).mockResolvedValue({ data: mockSummary });
-      (aiHelper.tryGemini as any).mockResolvedValue('Ringkasan AI Wikipedia.');
+      (aiHelper.tryAllProviders as any).mockResolvedValue('Ringkasan AI Wikipedia.');
 
       const response = await request(app)
         .post('/api/delema/v1/research/wikipedia')
@@ -140,9 +138,7 @@ describe('Research API', () => {
       };
 
       (axios.get as any).mockResolvedValue({ data: mockSummary });
-      (aiHelper.tryGemini as any).mockRejectedValue(new Error('Gemini failed'));
-      (aiHelper.tryGroq as any).mockRejectedValue(new Error('Groq failed'));
-      (aiHelper.tryOpenRouter as any).mockRejectedValue(new Error('OpenRouter failed'));
+      (aiHelper.tryAllProviders as any).mockRejectedValue(new Error('All providers failed'));
 
       const response = await request(app)
         .post('/api/delema/v1/research/wikipedia')

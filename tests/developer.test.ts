@@ -15,19 +15,17 @@ describe('Developer API Suite', () => {
   describe('POST /api/delema/v1/code/explain', () => {
     it('should explain code successfully', async () => {
       const mockExplanation = 'This code defines a function that adds two numbers.';
-      (aiHelper.tryGemini as any).mockResolvedValue(mockExplanation);
+      (aiHelper.tryAllProviders as any).mockResolvedValue(mockExplanation);
 
-      const response = await request(app)
-        .post('/api/delema/v1/code/explain')
-        .send({
-          code: 'function add(a, b) { return a + b; }',
-          language: 'javascript',
-          context: 'Basic arithmetic'
-        });
+      const response = await request(app).post('/api/delema/v1/code/explain').send({
+        code: 'function add(a, b) { return a + b; }',
+        language: 'javascript',
+        context: 'Basic arithmetic',
+      });
 
       expect(response.status).toBe(200);
       expect(response.body.explanation).toBe(mockExplanation);
-      expect(aiHelper.tryGemini).toHaveBeenCalled();
+      expect(aiHelper.tryAllProviders).toHaveBeenCalled();
     });
 
     it('should return 400 for missing code', async () => {
@@ -42,15 +40,13 @@ describe('Developer API Suite', () => {
   describe('POST /api/delema/v1/code/debug', () => {
     it('should debug code successfully', async () => {
       const mockFix = 'The bug was a missing semicolon. Fixed code: ...';
-      (aiHelper.tryGemini as any).mockResolvedValue(mockFix);
+      (aiHelper.tryAllProviders as any).mockResolvedValue(mockFix);
 
-      const response = await request(app)
-        .post('/api/delema/v1/code/debug')
-        .send({
-          code: 'const x = 10',
-          error: 'SyntaxError',
-          language: 'javascript'
-        });
+      const response = await request(app).post('/api/delema/v1/code/debug').send({
+        code: 'const x = 10',
+        error: 'SyntaxError',
+        language: 'javascript',
+      });
 
       expect(response.status).toBe(200);
       expect(response.body.fix).toBe(mockFix);
@@ -68,15 +64,13 @@ describe('Developer API Suite', () => {
   describe('POST /api/delema/v1/code/generate', () => {
     it('should generate code successfully', async () => {
       const mockGeneratedCode = '```javascript\nconsole.log("Hello World");\n```';
-      (aiHelper.tryGemini as any).mockResolvedValue(mockGeneratedCode);
+      (aiHelper.tryAllProviders as any).mockResolvedValue(mockGeneratedCode);
 
-      const response = await request(app)
-        .post('/api/delema/v1/code/generate')
-        .send({
-          prompt: 'Print hello world',
-          language: 'javascript',
-          framework: 'Node.js'
-        });
+      const response = await request(app).post('/api/delema/v1/code/generate').send({
+        prompt: 'Print hello world',
+        language: 'javascript',
+        framework: 'Node.js',
+      });
 
       expect(response.status).toBe(200);
       expect(response.body.code).toBe(mockGeneratedCode);
@@ -86,7 +80,7 @@ describe('Developer API Suite', () => {
       const response1 = await request(app)
         .post('/api/delema/v1/code/generate')
         .send({ language: 'javascript' });
-      
+
       const response2 = await request(app)
         .post('/api/delema/v1/code/generate')
         .send({ prompt: 'Hello' });
@@ -99,15 +93,13 @@ describe('Developer API Suite', () => {
   describe('POST /api/delema/v1/code/refactor', () => {
     it('should refactor code successfully', async () => {
       const mockRefactored = 'const add = (a, b) => a + b;';
-      (aiHelper.tryGemini as any).mockResolvedValue(mockRefactored);
+      (aiHelper.tryAllProviders as any).mockResolvedValue(mockRefactored);
 
-      const response = await request(app)
-        .post('/api/delema/v1/code/refactor')
-        .send({
-          code: 'function add(a, b) { return a + b; }',
-          instruction: 'Use arrow function',
-          language: 'javascript'
-        });
+      const response = await request(app).post('/api/delema/v1/code/refactor').send({
+        code: 'function add(a, b) { return a + b; }',
+        instruction: 'Use arrow function',
+        language: 'javascript',
+      });
 
       expect(response.status).toBe(200);
       expect(response.body.refactoredCode).toBe(mockRefactored);
@@ -128,12 +120,12 @@ describe('Developer API Suite', () => {
         title: 'React Reference: useState',
         content: 'useState is a React Hook...',
         url: 'https://react.dev/reference/react/useState',
-        source: 'React Docs (Direct)'
+        source: 'React Docs (Direct)',
       };
       const mockAnswer = 'useState allows you to add state to functional components.';
 
       (DocsScraper.prototype.search as any).mockResolvedValue(mockDocsResult);
-      (aiHelper.tryGemini as any).mockResolvedValue(mockAnswer);
+      (aiHelper.tryAllProviders as any).mockResolvedValue(mockAnswer);
 
       const response = await request(app)
         .get('/api/delema/v1/docs')
@@ -146,9 +138,7 @@ describe('Developer API Suite', () => {
     });
 
     it('should return 400 for missing query', async () => {
-      const response = await request(app)
-        .get('/api/delema/v1/docs')
-        .query({ framework: 'react' });
+      const response = await request(app).get('/api/delema/v1/docs').query({ framework: 'react' });
 
       expect(response.status).toBe(400);
     });

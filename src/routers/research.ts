@@ -2,7 +2,7 @@ import { Router, Request, Response } from 'express';
 import axios from 'axios';
 import arxivClient, { all } from 'arxiv-client';
 import { SearchRequestSchema } from '../types/schemas';
-import { tryGemini, tryGroq, tryOpenRouter } from '../utils/ai_helper';
+import { tryAllProviders } from '../utils/ai_helper';
 import { webhookLogger } from '../utils/logger';
 
 const router = Router();
@@ -19,10 +19,7 @@ router.post('/arxiv', async (req: Request, res: Response) => {
   const { query, limit = 10 } = validation.data;
 
   try {
-    const results = await arxivClient
-      .query(all(query))
-      .maxResults(limit)
-      .execute();
+    const results = await arxivClient.query(all(query)).maxResults(limit).execute();
 
     const papers = results.map((paper: any) => ({
       title: paper.title,
@@ -37,12 +34,6 @@ router.post('/arxiv', async (req: Request, res: Response) => {
     let ai_summary: string | undefined = undefined;
 
     if (papers.length > 0) {
-      const providers = [
-        { name: 'Gemini', fn: tryGemini },
-        { name: 'Groq', fn: tryGroq },
-        { name: 'OpenRouter', fn: tryOpenRouter },
-      ];
-
       const abstracts = papers
         .slice(0, 10)
         .map((p: any, i: number) => `[${i + 1}] ${p.summary.substring(0, 1500)}`)
@@ -50,30 +41,15 @@ router.post('/arxiv', async (req: Request, res: Response) => {
 
       const prompt = `Gunakan informasi abstrak penelitian berikut untuk merangkum lanskap penelitian terkini tentang topik: "${query}". Berikan ringkasan dalam format "TL;DR:" yang sangat ringkas dan informatif dalam Bahasa Indonesia.\n\nAbstrak:\n${abstracts}`;
 
-      for (const provider of providers) {
-        try {
-          webhookLogger.log(
-            `Generating AI summary for arXiv query "${query}" using ${provider.name}...`,
-            'AI',
-          );
-          const response = await provider.fn(prompt);
-          if (response) {
-            ai_summary = response.trim();
-            webhookLogger.log(
-              `AI summary for arXiv generated successfully using ${provider.name}`,
-              'SUCCESS',
-            );
-            break;
-          }
-        } catch (error: any) {
-          webhookLogger.log(`Provider ${provider.name} failed for arXiv: ${error.message}`, 'WARN');
-        }
+      try {
+        ai_summary = await tryAllProviders(prompt);
+      } catch (error: any) {
+        webhookLogger.log(
+          `All AI providers failed for arXiv summary of "${query}": ${error.message}`,
+          'ERROR',
+        );
+        ai_summary = 'Gagal menghasilkan ringkasan AI.';
       }
-    }
-
-    if (!ai_summary && papers.length > 0) {
-      webhookLogger.log(`All AI providers failed for arXiv summary of "${query}"`, 'ERROR');
-      ai_summary = 'Gagal menghasilkan ringkasan AI.';
     }
 
     return res.json({
@@ -104,17 +80,23 @@ router.post('/wikipedia', async (req: Request, res: Response) => {
     // Try English first
     try {
       const enUrl = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(query)}`;
-      const response = await axios.get(enUrl, { headers: { 'User-Agent': userAgent }, timeout: 10000 });
+      const response = await axios.get(enUrl, {
+        headers: { 'User-Agent': userAgent },
+        timeout: 10000,
+      });
       summaryData = response.data;
     } catch (e: any) {
       // If 404 on EN, try ID
       if (e.response?.status === 404) {
         try {
           const idUrl = `https://id.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(query)}`;
-          const response = await axios.get(idUrl, { headers: { 'User-Agent': userAgent }, timeout: 10000 });
+          const response = await axios.get(idUrl, {
+            headers: { 'User-Agent': userAgent },
+            timeout: 10000,
+          });
           summaryData = response.data;
           usedLang = 'id';
-        } catch (idError) {
+        } catch {
           throw e; // throw original EN 404 if ID also fails
         }
       } else {
@@ -128,38 +110,24 @@ router.post('/wikipedia', async (req: Request, res: Response) => {
 
     let ai_summary: string | undefined = undefined;
 
-    // Force AI Summary
-    const providers = [
-      { name: 'Gemini', fn: tryGemini },
-      { name: 'Groq', fn: tryGroq },
-      { name: 'OpenRouter', fn: tryOpenRouter },
-    ];
-
     const prompt = `Buatkan ringkasan sangat singkat dalam format "TL;DR:" untuk pertanyaan: "${query}". Gunakan HANYA informasi berikut dari Wikipedia: "${(summaryData.extract || '').substring(0, 1500)}". Jika informasinya tidak relevan, katakan saja "Konteks relevan tidak ditemukan di Wikipedia."`;
 
-    for (const provider of providers) {
-      try {
-        webhookLogger.log(`Generating AI summary for "${query}" using ${provider.name}...`, 'AI');
-        const response = await provider.fn(prompt);
-        if (response) {
-          ai_summary = response.trim();
-          webhookLogger.log(`AI summary generated successfully using ${provider.name}`, 'SUCCESS');
-          break;
-        }
-      } catch (error: any) {
-        webhookLogger.log(`Provider ${provider.name} failed: ${error.message}`, 'WARN');
-      }
-    }
-
-    if (!ai_summary) {
-      webhookLogger.log(`All AI providers failed for Wikipedia summary of "${query}"`, 'ERROR');
+    try {
+      ai_summary = await tryAllProviders(prompt);
+    } catch (error: any) {
+      webhookLogger.log(
+        `All AI providers failed for Wikipedia summary of "${query}": ${error.message}`,
+        'ERROR',
+      );
       ai_summary = 'Gagal menghasilkan ringkasan AI.';
     }
 
     return res.json({
       title: summaryData.title,
       summary: (summaryData.extract || '').substring(0, 2000),
-      fullurl: summaryData.content_urls?.desktop?.page || `https://${usedLang}.wikipedia.org/wiki/${encodeURIComponent(summaryData.title)}`,
+      fullurl:
+        summaryData.content_urls?.desktop?.page ||
+        `https://${usedLang}.wikipedia.org/wiki/${encodeURIComponent(summaryData.title)}`,
       ai_summary,
     });
   } catch (error: any) {
