@@ -28,7 +28,7 @@ router.post('/search', async (req: Request, res: Response) => {
     limit: limit,
   };
 
-  webhookLogger.log(`Searching FDA ${category} for: ${query}`, 'FDA');
+  webhookLogger.info(`Searching FDA ${category} for: ${query}`);
 
   try {
     const response = await axios.get(url, { params, timeout: 15000 });
@@ -38,7 +38,7 @@ router.post('/search', async (req: Request, res: Response) => {
       return res.json({ results: [], message: 'No results found' });
     }
 
-    webhookLogger.log(`FDA API Error: ${error.message}`, 'ERROR');
+    webhookLogger.error(`FDA API Error: ${error.message}`);
     return res.status(error.response?.status || 500).json({
       detail: error.response?.data?.error?.message || 'FDA API request failed',
     });

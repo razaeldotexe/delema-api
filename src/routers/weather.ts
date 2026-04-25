@@ -118,16 +118,15 @@ router.get('/', async (req: Request, res: Response) => {
     // Validate with Zod
     const validation = WeatherResponseSchema.safeParse(responseData);
     if (!validation.success) {
-      webhookLogger.log(
-        `Weather Validation Error: ${JSON.stringify(validation.error.errors)}`,
-        'ERROR',
+      webhookLogger.error(
+        `Weather Validation Error: ${JSON.stringify(validation.error.errors)}`
       );
       return res.status(500).json({ detail: 'Internal server error: Invalid weather data format' });
     }
 
     return res.json(validation.data);
   } catch (error: any) {
-    webhookLogger.log(`Weather Error: ${error.message}`, 'ERROR');
+    webhookLogger.error(`Weather Error: ${error.message}`);
     return res.status(500).json({ detail: 'Internal server error while fetching weather data' });
   }
 });

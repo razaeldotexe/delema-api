@@ -48,7 +48,7 @@ router.post('/search', async (req: Request, res: Response) => {
     `;
 
     try {
-      webhookLogger.log(`Processing hybrid search using multi-provider rotation...`, 'AI');
+      webhookLogger.ai(`Processing hybrid search using multi-provider rotation...`);
       const rawResponse = await tryAllProviders(prompt);
 
       const cleanJson = rawResponse
@@ -59,11 +59,11 @@ router.post('/search', async (req: Request, res: Response) => {
       const products = JSON.parse(cleanJson);
 
       if (Array.isArray(products)) {
-        webhookLogger.log(`Hybrid search successful`, 'SUCCESS');
+        webhookLogger.success(`Hybrid search successful`);
         return res.json(products.slice(0, limit));
       }
     } catch (error: any) {
-      webhookLogger.log(`All AI providers failed: ${error.message}`, 'ERROR');
+      webhookLogger.error(`All AI providers failed: ${error.message}`);
       return res
         .status(503)
         .json({ detail: 'All AI providers failed to process the hybrid search request.' });

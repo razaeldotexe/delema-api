@@ -11,14 +11,13 @@ export const requestLogger = (req: Request, res: Response, next: NextFunction) =
     const duration = Date.now() - start;
     const message = `${req.method} ${req.originalUrl} ${res.statusCode} - ${duration}ms`;
 
-    let level = 'INFO';
     if (res.statusCode >= 500) {
-      level = 'ERROR';
+      webhookLogger.error(message);
     } else if (res.statusCode >= 400) {
-      level = 'WARNING';
+      webhookLogger.warn(message);
+    } else {
+      webhookLogger.info(message);
     }
-
-    webhookLogger.log(message, level);
   });
 
   next();
@@ -39,7 +38,7 @@ export const errorHandler = (err: any, req: Request, res: Response, _next: NextF
     detail = err.errors;
   }
 
-  webhookLogger.log(`Unhandled Error: ${message}\nStack: ${err.stack}`, 'ERROR');
+  webhookLogger.error(`Unhandled Error: ${message}`, err);
 
   res.status(status).json({
     detail: detail || message,

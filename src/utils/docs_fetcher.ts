@@ -18,16 +18,15 @@ export class DocsScraper {
    */
   async search(query: string, framework?: string): Promise<DocsResult> {
     try {
-      webhookLogger.log(
-        `Searching docs for: ${query} (Framework: ${framework || 'None'})`,
-        'DOCS_SCRAPER',
+      webhookLogger.info(
+        `Searching docs for: ${query} (Framework: ${framework || 'None'})`
       );
 
       // 1. Try direct hit for known frameworks first
       if (framework) {
         const directResult = await this.tryDirectHit(query, framework);
         if (directResult) {
-          webhookLogger.log(`Direct hit success for ${framework}`, 'SUCCESS');
+          webhookLogger.success(`Direct hit success for ${framework}`);
           return directResult;
         }
       }
@@ -36,7 +35,7 @@ export class DocsScraper {
       return await this.fallbackSearch(query, framework);
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : String(error);
-      webhookLogger.log(`DocsScraper failed: ${errorMsg}`, 'ERROR');
+      webhookLogger.error(`DocsScraper failed: ${errorMsg}`);
       return {
         title: 'Error',
         content: `Failed to fetch documentation: ${errorMsg}`,
@@ -85,7 +84,7 @@ export class DocsScraper {
       searchQuery = `site:${site} ${query}`;
     }
 
-    webhookLogger.log(`DDG Fallback Search: ${searchQuery}`, 'DOCS_SCRAPER');
+    webhookLogger.info(`DDG Fallback Search: ${searchQuery}`);
 
     let topResult: any = null;
     try {
@@ -94,7 +93,7 @@ export class DocsScraper {
         break;
       }
     } catch (err) {
-      webhookLogger.log(`DDG Search failed: ${err}`, 'WARNING');
+      webhookLogger.warn(`DDG Search failed: ${err}`);
     }
 
     if (!topResult) {
@@ -106,7 +105,7 @@ export class DocsScraper {
       };
     }
 
-    webhookLogger.log(`Fetching content from: ${topResult.href}`, 'DOCS_SCRAPER');
+    webhookLogger.info(`Fetching content from: ${topResult.href}`);
     const pageContent = await this.fetchPageText(topResult.href);
 
     return {

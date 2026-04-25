@@ -14,7 +14,7 @@ export interface ProductResult {
 export async function fetchRealProducts(query: string, maxResults = 5): Promise<ProductResult[]> {
   const results: ProductResult[] = [];
   try {
-    webhookLogger.log(`Fetching real products for: ${query}`, 'SCRAPER');
+    webhookLogger.info(`Fetching real products for: ${query}`);
 
     // Mencari di DuckDuckGo dengan keyword shopping agar data lebih akurat
     const searchQuery = `${query} price buy online`;
@@ -33,11 +33,10 @@ export async function fetchRealProducts(query: string, maxResults = 5): Promise<
       count++;
     }
 
-    webhookLogger.log(`Found ${results.length} real product links.`, 'SUCCESS');
+    webhookLogger.success(`Found ${results.length} real product links.`);
   } catch (error) {
-    webhookLogger.log(
-      `Scraper failed: ${error instanceof Error ? error.message : String(error)}`,
-      'ERROR',
+    webhookLogger.error(
+      `Scraper failed: ${error instanceof Error ? error.message : String(error)}`
     );
   }
 
@@ -50,7 +49,7 @@ export async function fetchRealProducts(query: string, maxResults = 5): Promise<
 export async function fetchStoreLinks(query: string): Promise<ProductResult[]> {
   const results: ProductResult[] = [];
   try {
-    webhookLogger.log(`Searching store links for: ${query}`, 'APP_CHECKER');
+    webhookLogger.info(`Searching store links for: ${query}`);
 
     // Query tertarget untuk berbagai store utama
     const searchQuery = `${query} (site:play.google.com OR site:apps.apple.com OR site:store.steampowered.com OR site:epicgames.com OR site:store.playstation.com OR site:xbox.com OR site:nintendo.com)`;
@@ -69,11 +68,10 @@ export async function fetchStoreLinks(query: string): Promise<ProductResult[]> {
       count++;
     }
 
-    webhookLogger.log(`Found ${results.length} potential store links.`, 'SUCCESS');
+    webhookLogger.success(`Found ${results.length} potential store links.`);
   } catch (error) {
-    webhookLogger.log(
-      `App Store Search failed: ${error instanceof Error ? error.message : String(error)}`,
-      'ERROR',
+    webhookLogger.error(
+      `App Store Search failed: ${error instanceof Error ? error.message : String(error)}`
     );
   }
 

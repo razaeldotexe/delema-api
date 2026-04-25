@@ -44,9 +44,8 @@ router.post('/arxiv', async (req: Request, res: Response) => {
       try {
         ai_summary = await tryAllProviders(prompt);
       } catch (error: any) {
-        webhookLogger.log(
-          `All AI providers failed for arXiv summary of "${query}": ${error.message}`,
-          'ERROR',
+        webhookLogger.error(
+          `All AI providers failed for arXiv summary of "${query}": ${error.message}`
         );
         ai_summary = 'Gagal menghasilkan ringkasan AI.';
       }
@@ -115,9 +114,8 @@ router.post('/wikipedia', async (req: Request, res: Response) => {
     try {
       ai_summary = await tryAllProviders(prompt);
     } catch (error: any) {
-      webhookLogger.log(
-        `All AI providers failed for Wikipedia summary of "${query}": ${error.message}`,
-        'ERROR',
+      webhookLogger.error(
+        `All AI providers failed for Wikipedia summary of "${query}": ${error.message}`
       );
       ai_summary = 'Gagal menghasilkan ringkasan AI.';
     }

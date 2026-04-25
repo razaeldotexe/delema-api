@@ -35,7 +35,7 @@ export async function tryGemini(prompt: string): Promise<string> {
         return response.data.candidates[0].content.parts[0].text;
       }
     } catch (error: any) {
-      webhookLogger.log(`Gemini ${model} failed: ${error.message}`, 'WARN');
+      webhookLogger.warn(`Gemini ${model} failed: ${error.message}`);
     }
   }
   throw new Error('All Gemini models failed');
@@ -76,7 +76,7 @@ export async function tryGeminiVision(
         return response.data.candidates[0].content.parts[0].text;
       }
     } catch (error: any) {
-      webhookLogger.log(`Gemini Vision ${model} failed: ${error.message}`, 'WARN');
+      webhookLogger.warn(`Gemini Vision ${model} failed: ${error.message}`);
     }
   }
   throw new Error('All Gemini Vision models failed');
@@ -108,7 +108,7 @@ export async function tryGroq(prompt: string): Promise<string> {
         return response.data.choices[0].message.content;
       }
     } catch (error: any) {
-      webhookLogger.log(`Groq ${model} failed: ${error.message}`, 'WARN');
+      webhookLogger.warn(`Groq ${model} failed: ${error.message}`);
     }
   }
   throw new Error('All Groq models failed');
@@ -141,7 +141,7 @@ export async function tryOpenRouter(prompt: string): Promise<string> {
         return response.data.choices[0].message.content;
       }
     } catch (error: any) {
-      webhookLogger.log(`OpenRouter ${model} failed: ${error.message}`, 'WARN');
+      webhookLogger.warn(`OpenRouter ${model} failed: ${error.message}`);
     }
   }
   throw new Error('All OpenRouter models failed');
@@ -159,7 +159,7 @@ export async function tryAllProviders(prompt: string): Promise<string> {
       const result = await provider.fn(prompt);
       if (result) return result;
     } catch (error: any) {
-      webhookLogger.log(`${provider.name} provider exhausted: ${error.message}`, 'WARN');
+      webhookLogger.warn(`${provider.name} provider exhausted: ${error.message}`);
     }
   }
 
