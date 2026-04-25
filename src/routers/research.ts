@@ -48,7 +48,7 @@ router.post('/arxiv', async (req: Request, res: Response) => {
         .map((p: any, i: number) => `[${i + 1}] ${p.summary.substring(0, 1500)}`)
         .join('\n\n');
 
-      const prompt = `Gunakan informasi abstrak penelitian berikut untuk merangkum lanskap penelitian terkini tentang topik: "${query}". Berikan ringkasan yang ringkas dan informatif (maksimal 4-5 kalimat) dalam Bahasa Indonesia.\n\nAbstrak:\n${abstracts}`;
+      const prompt = `Gunakan informasi abstrak penelitian berikut untuk merangkum lanskap penelitian terkini tentang topik: "${query}". Berikan ringkasan dalam format "TL;DR:" yang sangat ringkas dan informatif dalam Bahasa Indonesia.\n\nAbstrak:\n${abstracts}`;
 
       for (const provider of providers) {
         try {
@@ -135,7 +135,7 @@ router.post('/wikipedia', async (req: Request, res: Response) => {
       { name: 'OpenRouter', fn: tryOpenRouter },
     ];
 
-    const prompt = `Buatkan ringkasan singkat (maksimal 2-3 kalimat) dan langsung ke intinya untuk pertanyaan: "${query}". Gunakan HANYA informasi berikut dari Wikipedia: "${(summaryData.extract || '').substring(0, 1500)}". Jika informasinya tidak relevan, katakan saja "Konteks relevan tidak ditemukan di Wikipedia."`;
+    const prompt = `Buatkan ringkasan sangat singkat dalam format "TL;DR:" untuk pertanyaan: "${query}". Gunakan HANYA informasi berikut dari Wikipedia: "${(summaryData.extract || '').substring(0, 1500)}". Jika informasinya tidak relevan, katakan saja "Konteks relevan tidak ditemukan di Wikipedia."`;
 
     for (const provider of providers) {
       try {
