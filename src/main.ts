@@ -33,7 +33,7 @@ app.use(requestLogger);
 webhookLogger.log('Delema API (Node.js) is starting up...', 'SYSTEM');
 
 // Routes
-const apiPrefix = '/api/v1';
+const apiPrefix = '/api/delema/v1';
 app.use(`${apiPrefix}/research`, researchRouter);
 app.use(`${apiPrefix}/ai`, aiSearchRouter);
 app.use(`${apiPrefix}/fda`, fdaRouter);
@@ -352,7 +352,7 @@ app.get('/', (req, res) => {
           resBody.textContent = 'Loading...';
           
           try {
-            let url = '/api/v1' + path;
+            let url = '/api/delema/v1' + path;
             const options = { method, headers: { 'Content-Type': 'application/json' } };
             
             if (method === 'GET') {

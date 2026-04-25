@@ -16,7 +16,7 @@ describe('Research API', () => {
     vi.clearAllMocks();
   });
 
-  describe('POST /api/v1/research/arxiv', () => {
+  describe('POST /api/delema/v1/research/arxiv', () => {
     it('should return papers and an AI summary', async () => {
       const mockPapers = [
         {
@@ -34,7 +34,7 @@ describe('Research API', () => {
       (aiHelper.tryGemini as any).mockResolvedValue('Ringkasan AI dalam Bahasa Indonesia.');
 
       const response = await request(app)
-        .post('/api/v1/research/arxiv')
+        .post('/api/delema/v1/research/arxiv')
         .send({ query: 'artificial intelligence', limit: 1 });
 
       expect(response.status).toBe(200);
@@ -48,7 +48,7 @@ describe('Research API', () => {
       (arxivSearch as any).mockResolvedValue([]);
 
       const response = await request(app)
-        .post('/api/v1/research/arxiv')
+        .post('/api/delema/v1/research/arxiv')
         .send({ query: 'nonexistent topic' });
 
       expect(response.status).toBe(200);
@@ -58,7 +58,7 @@ describe('Research API', () => {
 
     it('should return 422 for missing query', async () => {
       const response = await request(app)
-        .post('/api/v1/research/arxiv')
+        .post('/api/delema/v1/research/arxiv')
         .send({ limit: 5 });
 
       expect(response.status).toBe(422);
@@ -83,7 +83,7 @@ describe('Research API', () => {
       (aiHelper.tryOpenRouter as any).mockRejectedValue(new Error('OpenRouter failed'));
 
       const response = await request(app)
-        .post('/api/v1/research/arxiv')
+        .post('/api/delema/v1/research/arxiv')
         .send({ query: 'ai' });
 
       expect(response.status).toBe(200);
@@ -91,7 +91,7 @@ describe('Research API', () => {
     });
   });
 
-  describe('POST /api/v1/research/wikipedia', () => {
+  describe('POST /api/delema/v1/research/wikipedia', () => {
     it('should return wikipedia summary and AI summary', async () => {
       const mockPage = {
         title: 'Test Topic',
@@ -103,7 +103,7 @@ describe('Research API', () => {
       (aiHelper.tryGemini as any).mockResolvedValue('Ringkasan AI Wikipedia.');
 
       const response = await request(app)
-        .post('/api/v1/research/wikipedia')
+        .post('/api/delema/v1/research/wikipedia')
         .send({ query: 'Test Topic' });
 
       expect(response.status).toBe(200);
@@ -116,7 +116,7 @@ describe('Research API', () => {
       (wikipedia.page as any).mockRejectedValue(new Error('Could not find page'));
 
       const response = await request(app)
-        .post('/api/v1/research/wikipedia')
+        .post('/api/delema/v1/research/wikipedia')
         .send({ query: 'NonExistentPage12345' });
 
       expect(response.status).toBe(404);
@@ -125,7 +125,7 @@ describe('Research API', () => {
 
     it('should return 422 for missing query', async () => {
       const response = await request(app)
-        .post('/api/v1/research/wikipedia')
+        .post('/api/delema/v1/research/wikipedia')
         .send({});
 
       expect(response.status).toBe(422);
@@ -144,7 +144,7 @@ describe('Research API', () => {
       (aiHelper.tryOpenRouter as any).mockRejectedValue(new Error('OpenRouter failed'));
 
       const response = await request(app)
-        .post('/api/v1/research/wikipedia')
+        .post('/api/delema/v1/research/wikipedia')
         .send({ query: 'Test Topic' });
 
       expect(response.status).toBe(200);

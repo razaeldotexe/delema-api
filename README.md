@@ -24,16 +24,16 @@ Delema API is a specialized decision-support engine designed to help developers 
 
 ### Recommendations
 
-- `POST /api/v1/recommend/score`: Ranks items based on weighted features.
+- `POST /api/delema/v1/recommend/score`: Ranks items based on weighted features.
 
 ### Rules Engine
 
-- `POST /api/v1/rules/evaluate`: Evaluates logical rulesets against facts.
-- `POST /api/v1/rules/decision-tree`: Traverses a decision tree to return an outcome.
+- `POST /api/delema/v1/rules/evaluate`: Evaluates logical rulesets against facts.
+- `POST /api/delema/v1/rules/decision-tree`: Traverses a decision tree to return an outcome.
 
 ### Automated Routing
 
-- `POST /api/v1/routing/ab-test`: Assigns a user to a variant deterministically.
+- `POST /api/delema/v1/routing/ab-test`: Assigns a user to a variant deterministically.
 
 ## Getting Started
 

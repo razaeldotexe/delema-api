@@ -27,7 +27,7 @@ describe('Outfit Rating API', () => {
     (aiHelper.tryGeminiVision as any).mockResolvedValue(mockAiResponse);
 
     const response = await request(app)
-      .post('/api/v1/outfit/rate')
+      .post('/api/delema/v1/outfit/rate')
       .send({ image_url: 'https://example.com/outfit.png', context: 'summer party' });
 
     expect(response.status).toBe(200);
@@ -58,7 +58,7 @@ describe('Outfit Rating API', () => {
     (aiHelper.tryGeminiVision as any).mockResolvedValue(mockAiResponse);
 
     const response = await request(app)
-      .post('/api/v1/outfit/rate')
+      .post('/api/delema/v1/outfit/rate')
       .send({ image_base64: base64Input });
 
     expect(response.status).toBe(200);
@@ -71,7 +71,7 @@ describe('Outfit Rating API', () => {
   });
 
   it('should return 422 if no image is provided', async () => {
-    const response = await request(app).post('/api/v1/outfit/rate').send({ context: 'test' });
+    const response = await request(app).post('/api/delema/v1/outfit/rate').send({ context: 'test' });
 
     expect(response.status).toBe(422);
   });
@@ -81,7 +81,7 @@ describe('Outfit Rating API', () => {
       new Error('All Gemini Vision models failed'),
     );
 
-    const response = await request(app).post('/api/v1/outfit/rate').send({ image_base64: 'abc' });
+    const response = await request(app).post('/api/delema/v1/outfit/rate').send({ image_base64: 'abc' });
 
     expect(response.status).toBe(500);
     expect(response.body.detail).toBe('All Gemini Vision models failed');

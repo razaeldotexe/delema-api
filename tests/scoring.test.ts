@@ -16,7 +16,7 @@ describe('Scoring API', () => {
       },
     };
 
-    const response = await request(app).post('/api/v1/recommendations/score').send(payload);
+    const response = await request(app).post('/api/delema/v1/recommendations/score').send(payload);
 
     expect(response.status).toBe(200);
     expect(response.body.scored_items).toHaveLength(3);
@@ -40,7 +40,7 @@ describe('Scoring API', () => {
       weights: { price: 1 },
     };
 
-    const response = await request(app).post('/api/v1/recommendations/score').send(payload);
+    const response = await request(app).post('/api/delema/v1/recommendations/score').send(payload);
 
     expect(response.status).toBe(200);
     expect(response.body.scored_items).toEqual([]);
@@ -52,7 +52,7 @@ describe('Scoring API', () => {
       // missing weights
     };
 
-    const response = await request(app).post('/api/v1/recommendations/score').send(payload);
+    const response = await request(app).post('/api/delema/v1/recommendations/score').send(payload);
 
     expect(response.status).toBe(400);
   });
