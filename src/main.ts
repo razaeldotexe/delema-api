@@ -71,7 +71,6 @@ app.get('/', (req, res) => {
           background: var(--bg-main); 
           color: var(--text-main); 
           margin: 0; 
-          padding-bottom: 80px; 
           -webkit-font-smoothing: antialiased;
         }
 
@@ -224,25 +223,6 @@ app.get('/', (req, res) => {
           border: 1px solid var(--border);
         }
 
-        /* Bottom Nav */
-        .bottom-nav { 
-          position: fixed; 
-          bottom: 0; 
-          left: 0; 
-          right: 0; 
-          background: var(--bg-main); 
-          border-top: 1px solid var(--border); 
-          padding: 0.75rem 1rem; 
-          display: flex; 
-          justify-content: space-around; 
-          max-width: 800px; 
-          margin: 0 auto; 
-          z-index: 100;
-        }
-        .nav-item { color: var(--text-muted); font-size: 1.2rem; cursor: pointer; transition: color 0.2s; }
-        .nav-item:hover { color: var(--text-white); }
-        .nav-item.active { color: var(--text-white); }
-
         @media (max-width: 640px) {
           .hero h1 { font-size: 1.8rem; }
           .endpoint-name { display: none; }
@@ -267,14 +247,6 @@ app.get('/', (req, res) => {
       <main class="content" id="api-list">
         <!-- Categories will be injected here -->
       </main>
-
-      <nav class="bottom-nav">
-        <div class="nav-item active"><i class="fas fa-home"></i></div>
-        <div class="nav-item"><i class="fas fa-bookmark"></i></div>
-        <div class="nav-item"><i class="fas fa-search"></i></div>
-        <div class="nav-item"><i class="fas fa-history"></i></div>
-        <div class="nav-item"><i class="fas fa-user"></i></div>
-      </nav>
 
       <script>
         const apiData = [
