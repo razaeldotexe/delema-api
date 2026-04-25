@@ -40,7 +40,7 @@ describe('Research API', () => {
 
       const response = await request(app)
         .post('/api/delema/v1/research/arxiv')
-        .send({ query: 'artificial intelligence', limit: 1 });
+        .send({ query: 'artificial intelligence', limit: 1, lang: 'Indonesian' });
 
       expect(response.status).toBe(200);
       expect(response.body.results).toHaveLength(1);
@@ -54,7 +54,7 @@ describe('Research API', () => {
 
       const response = await request(app)
         .post('/api/delema/v1/research/arxiv')
-        .send({ query: 'nonexistent topic' });
+        .send({ query: 'nonexistent topic', lang: 'English' });
 
       expect(response.status).toBe(200);
       expect(response.body.results).toHaveLength(0);
@@ -105,7 +105,7 @@ describe('Research API', () => {
 
       const response = await request(app)
         .post('/api/delema/v1/research/wikipedia')
-        .send({ query: 'Test Topic' });
+        .send({ query: 'Test Topic', lang: 'Indonesian' });
 
       expect(response.status).toBe(200);
       expect(response.body.title).toBe('Test Topic');
@@ -142,7 +142,7 @@ describe('Research API', () => {
 
       const response = await request(app)
         .post('/api/delema/v1/research/wikipedia')
-        .send({ query: 'Test Topic' });
+        .send({ query: 'Test Topic', lang: 'Indonesian' });
 
       expect(response.status).toBe(200);
       expect(response.body.ai_summary).toBe('Gagal menghasilkan ringkasan AI.');

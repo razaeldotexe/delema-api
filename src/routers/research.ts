@@ -16,7 +16,7 @@ router.post('/arxiv', async (req: Request, res: Response) => {
     return res.status(422).json({ detail: validation.error.errors });
   }
 
-  const { query, limit = 10 } = validation.data;
+  const { query, limit = 10, lang } = validation.data;
 
   try {
     const results = await arxivClient.query(all(query)).maxResults(limit).execute();
@@ -39,7 +39,8 @@ router.post('/arxiv', async (req: Request, res: Response) => {
         .map((p: any, i: number) => `[${i + 1}] ${p.summary.substring(0, 1500)}`)
         .join('\n\n');
 
-      const prompt = `Gunakan informasi abstrak penelitian berikut untuk merangkum lanskap penelitian terkini tentang topik: "${query}". Berikan ringkasan dalam format "TL;DR:" yang sangat ringkas dan informatif dalam Bahasa Indonesia.\n\nAbstrak:\n${abstracts}`;
+      const languageInstruction = lang ? `Response language: ${lang}.` : 'Response language: Indonesian.';
+      const prompt = `Gunakan informasi abstrak penelitian berikut untuk merangkum lanskap penelitian terkini tentang topik: "${query}". Berikan ringkasan dalam format "TL;DR:" yang sangat ringkas dan informatif. ${languageInstruction}\n\nAbstrak:\n${abstracts}`;
 
       try {
         ai_summary = await tryAllProviders(prompt);
@@ -69,7 +70,7 @@ router.post('/wikipedia', async (req: Request, res: Response) => {
     return res.status(422).json({ detail: validation.error.errors });
   }
 
-  const { query } = validation.data;
+  const { query, lang } = validation.data;
 
   try {
     const userAgent = 'DelemaAPI/1.0 (https://delema.razael-fox.my.id; contact@razael-fox.my.id)';
@@ -109,7 +110,8 @@ router.post('/wikipedia', async (req: Request, res: Response) => {
 
     let ai_summary: string | undefined = undefined;
 
-    const prompt = `Buatkan ringkasan sangat singkat dalam format "TL;DR:" untuk pertanyaan: "${query}". Gunakan HANYA informasi berikut dari Wikipedia: "${(summaryData.extract || '').substring(0, 1500)}". Jika informasinya tidak relevan, katakan saja "Konteks relevan tidak ditemukan di Wikipedia."`;
+    const languageInstruction = lang ? `Response language: ${lang}.` : 'Response language: Indonesian.';
+    const prompt = `Buatkan ringkasan sangat singkat dalam format "TL;DR:" untuk pertanyaan: "${query}". ${languageInstruction} Gunakan HANYA informasi berikut dari Wikipedia: "${(summaryData.extract || '').substring(0, 1500)}". Jika informasinya tidak relevan, katakan saja "Konteks relevan tidak ditemukan di Wikipedia."`;
 
     try {
       ai_summary = await tryAllProviders(prompt);

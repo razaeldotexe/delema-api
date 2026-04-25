@@ -15,7 +15,7 @@ router.post('/search', async (req: Request, res: Response) => {
     return res.status(422).json({ detail: validation.error.errors });
   }
 
-  const { query, category, limit = 5 } = validation.data;
+  const { query, category, limit = 5, lang } = validation.data;
 
   const baseUrls: Record<string, string> = {
     drug: 'https://api.fda.gov/drug/label.json',
@@ -52,7 +52,8 @@ router.post('/search', async (req: Request, res: Response) => {
         })
         .join('\n\n');
 
-      const prompt = `Gunakan data FDA (${category}) berikut untuk memberikan ringkasan informasi yang sangat singkat dan padat bagi pengguna awam tentang: "${query}". Berikan output dalam format "TL;DR:" yang informatif dalam Bahasa Indonesia.\n\nData:\n${contextStr}`;
+      const languageInstruction = lang ? `Response language: ${lang}.` : 'Response language: Indonesian.';
+      const prompt = `Gunakan data FDA (${category}) berikut untuk memberikan ringkasan informasi yang sangat singkat dan padat bagi pengguna awam tentang: "${query}". Berikan output dalam format "TL;DR:" yang informatif. ${languageInstruction}\n\nData:\n${contextStr}`;
 
       try {
         ai_summary = await tryAllProviders(prompt);

@@ -83,6 +83,7 @@ export type ABTestRequest = z.infer<typeof ABTestRequestSchema>;
 export const ProductSearchRequestSchema = z.object({
   query: z.string(),
   limit: z.number().optional().default(5),
+  lang: z.string().optional(),
 });
 
 export type ProductSearchRequest = z.infer<typeof ProductSearchRequestSchema>;
@@ -158,6 +159,7 @@ export const FDASearchRequestSchema = z.object({
   query: z.string(),
   category: FDACategoryEnum,
   limit: z.number().optional().default(5),
+  lang: z.string().optional(),
 });
 
 export type FDASearchRequest = z.infer<typeof FDASearchRequestSchema>;
@@ -196,6 +198,7 @@ export type FileInfo = z.infer<typeof FileInfoSchema>;
 export const SearchRequestSchema = z.object({
   query: z.string(),
   limit: z.number().optional().default(10),
+  lang: z.string().optional(),
 });
 
 export type SearchRequest = z.infer<typeof SearchRequestSchema>;
@@ -295,6 +298,7 @@ export const OutfitRatingRequestSchema = z
     image_url: z.string().url().optional(),
     image_base64: z.string().optional(),
     context: z.string().optional(),
+    lang: z.string().optional(),
   })
   .refine((data) => data.image_url || data.image_base64, {
     message: 'Either image_url or image_base64 must be provided',
@@ -317,6 +321,7 @@ export const CodeExplainSchema = z.object({
   code: z.string().min(1),
   language: z.string().optional(),
   context: z.string().optional(),
+  lang: z.string().optional(),
 });
 
 export type CodeExplainRequest = z.infer<typeof CodeExplainSchema>;
@@ -325,6 +330,7 @@ export const CodeDebugSchema = z.object({
   code: z.string().min(1),
   error: z.string().optional(),
   language: z.string().optional(),
+  lang: z.string().optional(),
 });
 
 export type CodeDebugRequest = z.infer<typeof CodeDebugSchema>;
@@ -333,6 +339,7 @@ export const CodeGenerateSchema = z.object({
   prompt: z.string().min(1),
   language: z.string().min(1),
   framework: z.string().optional(),
+  lang: z.string().optional(),
 });
 
 export type CodeGenerateRequest = z.infer<typeof CodeGenerateSchema>;
@@ -341,6 +348,7 @@ export const CodeRefactorSchema = z.object({
   code: z.string().min(1),
   instruction: z.string().optional(),
   language: z.string().optional(),
+  lang: z.string().optional(),
 });
 
 export type CodeRefactorRequest = z.infer<typeof CodeRefactorSchema>;
@@ -348,6 +356,7 @@ export type CodeRefactorRequest = z.infer<typeof CodeRefactorSchema>;
 export const DocsLookupSchema = z.object({
   query: z.string().min(1),
   framework: z.string().optional(),
+  lang: z.string().optional(),
 });
 
 export type DocsLookupRequest = z.infer<typeof DocsLookupSchema>;

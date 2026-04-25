@@ -333,7 +333,7 @@ app.get('/', (req, res) => {
 
       <div class="hero">
         <h1>THE <span class="accent">INTELLIGENT</span> ENGINE</h1>
-        <p>Decision Support & Research Infrastructure</p>
+        <p>Decision Support & Research Infrastructure • Multi-Language Ready</p>
       </div>
 
       <div class="stats-bar">
@@ -368,8 +368,8 @@ app.get('/', (req, res) => {
             category: "Research",
             icon: "fa-microscope",
             endpoints: [
-              { path: "/research/arxiv", name: "ARXIV SEARCH", method: "POST", desc: "Cari publikasi ilmiah di ArXiv dengan ringkasan AI.", body: { query: "machine learning", limit: 5 } },
-              { path: "/research/wikipedia", name: "WIKIPEDIA", method: "POST", desc: "Ambil ringkasan ensiklopedia dan sintesis AI.", body: { query: "Node.js" } },
+              { path: "/research/arxiv", name: "ARXIV SEARCH", method: "POST", desc: "Cari publikasi ilmiah di ArXiv dengan ringkasan AI.", body: { query: "machine learning", limit: 5, lang: "Indonesian" } },
+              { path: "/research/wikipedia", name: "WIKIPEDIA", method: "POST", desc: "Ambil ringkasan ensiklopedia dan sintesis AI.", body: { query: "Node.js", lang: "Indonesian" } },
               { path: "/research/nerdfont", name: "NERD FONTS", method: "POST", desc: "Cari dan unduh Nerd Fonts.", body: { query: "JetBrains" } }
             ]
           },
@@ -377,14 +377,14 @@ app.get('/', (req, res) => {
             category: "AI Search",
             icon: "fa-brain",
             endpoints: [
-              { path: "/ai/search", name: "AI SEARCH", method: "POST", desc: "Pencarian pintar berbasis AI untuk berbagai konten.", body: { query: "macbook air", limit: 3 } }
+              { path: "/ai/search", name: "AI SEARCH", method: "POST", desc: "Pencarian pintar berbasis AI untuk berbagai konten.", body: { query: "macbook air", limit: 3, lang: "English" } }
             ]
           },
           {
             category: "Health & Safety",
             icon: "fa-shield-heart",
             endpoints: [
-              { path: "/fda/search", name: "FDA SEARCH", method: "POST", desc: "Cari data obat, makanan, atau peralatan medis dari OpenFDA.", body: { query: "tylenol", category: "drug", limit: 5 } }
+              { path: "/fda/search", name: "FDA SEARCH", method: "POST", desc: "Cari data obat, makanan, atau peralatan medis dari OpenFDA.", body: { query: "tylenol", category: "drug", limit: 5, lang: "Indonesian" } }
             ]
           },
           {
@@ -398,11 +398,11 @@ app.get('/', (req, res) => {
             category: "Developer Suite",
             icon: "fa-code",
             endpoints: [
-              { path: "/code/explain", name: "CODE EXPLAIN", method: "POST", desc: "Jelaskan potongan kode dengan AI.", body: { code: "console.log('hello')", language: "javascript" } },
-              { path: "/code/debug", name: "CODE DEBUG", method: "POST", desc: "Cari dan perbaiki bug dalam kode.", body: { code: "function add(a, b) { return a - b }", error: "Should add instead of subtract", language: "javascript" } },
-              { path: "/code/generate", name: "CODE GENERATE", method: "POST", desc: "Generate kode berdasarkan prompt.", body: { prompt: "Create a simple express server", language: "typescript", framework: "express" } },
-              { path: "/code/refactor", name: "CODE REFACTOR", method: "POST", desc: "Refactor kode untuk kualitas lebih baik.", body: { code: "var x = 10; if(x == 10) { console.log(x) }", instruction: "Use modern syntax", language: "javascript" } },
-              { path: "/docs", name: "DOCS SEARCH", method: "GET", desc: "Cari dokumentasi dan sintesis jawaban AI.", body: null, queryParams: "q=useEffect&framework=react" }
+              { path: "/code/explain", name: "CODE EXPLAIN", method: "POST", desc: "Jelaskan potongan kode dengan AI.", body: { code: "console.log('hello')", language: "javascript", lang: "English" } },
+              { path: "/code/debug", name: "CODE DEBUG", method: "POST", desc: "Cari dan perbaiki bug dalam kode.", body: { code: "function add(a, b) { return a - b }", error: "Should add instead of subtract", language: "javascript", lang: "English" } },
+              { path: "/code/generate", name: "CODE GENERATE", method: "POST", desc: "Generate kode berdasarkan prompt.", body: { prompt: "Create a simple express server", language: "typescript", framework: "express", lang: "English" } },
+              { path: "/code/refactor", name: "CODE REFACTOR", method: "POST", desc: "Refactor kode untuk kualitas lebih baik.", body: { code: "var x = 10; if(x == 10) { console.log(x) }", instruction: "Use modern syntax", language: "javascript", lang: "English" } },
+              { path: "/docs", name: "DOCS SEARCH", method: "GET", desc: "Cari dokumentasi dan sintesis jawaban AI.", body: null, queryParams: "q=useEffect&framework=react&lang=English" }
             ]
           }
         ];

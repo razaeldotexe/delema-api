@@ -21,6 +21,7 @@ describe('Developer API Suite', () => {
         code: 'function add(a, b) { return a + b; }',
         language: 'javascript',
         context: 'Basic arithmetic',
+        lang: 'English',
       });
 
       expect(response.status).toBe(200);
@@ -46,6 +47,7 @@ describe('Developer API Suite', () => {
         code: 'const x = 10',
         error: 'SyntaxError',
         language: 'javascript',
+        lang: 'English',
       });
 
       expect(response.status).toBe(200);
@@ -70,6 +72,7 @@ describe('Developer API Suite', () => {
         prompt: 'Print hello world',
         language: 'javascript',
         framework: 'Node.js',
+        lang: 'English',
       });
 
       expect(response.status).toBe(200);
@@ -99,6 +102,7 @@ describe('Developer API Suite', () => {
         code: 'function add(a, b) { return a + b; }',
         instruction: 'Use arrow function',
         language: 'javascript',
+        lang: 'English',
       });
 
       expect(response.status).toBe(200);
@@ -129,7 +133,7 @@ describe('Developer API Suite', () => {
 
       const response = await request(app)
         .get('/api/delema/v1/docs')
-        .query({ q: 'useState', framework: 'react' });
+        .query({ q: 'useState', framework: 'react', lang: 'English' });
 
       expect(response.status).toBe(200);
       expect(response.body.answer).toBe(mockAnswer);

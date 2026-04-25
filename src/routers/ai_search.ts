@@ -12,7 +12,7 @@ router.post('/search', async (req: Request, res: Response) => {
     return res.status(422).json({ detail: validation.error.errors });
   }
 
-  const { query, limit = 5 } = validation.data;
+  const { query, limit = 5, lang } = validation.data;
 
   try {
     // Phase 1: Fetch Real Data
@@ -27,12 +27,14 @@ router.post('/search', async (req: Request, res: Response) => {
     }
 
     // Phase 2: AI Processing
+    const languageInstruction = lang ? `Response language: ${lang}.` : 'Response language: Indonesian.';
     const prompt = `
     User is searching for: "${query}".
     ${contextStr}
     
     Task: Based on the real results above (if any) and your knowledge, provide a list of up to ${limit} best product recommendations.
     Include valid source_url from the real data if it matches a recommendation.
+    ${languageInstruction}
     Format your response ONLY as a raw JSON list:
     [
         {

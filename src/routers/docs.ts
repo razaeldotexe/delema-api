@@ -18,11 +18,13 @@ router.get('/', async (req, res) => {
   const validated = DocsLookupSchema.parse({
     query: req.query.q || req.query.query,
     framework: req.query.framework,
+    lang: req.query.lang,
   });
 
   const result = await scraper.search(validated.query, validated.framework);
 
-  const prompt = `Based on the following documentation content, provide a concise developer-friendly answer for the query: "${validated.query}"\n\nContent:\n${result.content}\n\nSource: ${result.url}\n\nIf the content is not relevant, say you couldn't find a specific answer but provide what you can from the context.`;
+  const languageInstruction = validated.lang ? `Response language: ${validated.lang}.` : 'Response language: English.';
+  const prompt = `Based on the following documentation content, provide a concise developer-friendly answer for the query: "${validated.query}"\n\nContent:\n${result.content}\n\nSource: ${result.url}\n\n${languageInstruction}\n\nIf the content is not relevant, say you couldn't find a specific answer but provide what you can from the context.`;
 
   const answer = await tryAllProviders(prompt);
 
