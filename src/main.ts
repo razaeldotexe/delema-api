@@ -7,9 +7,8 @@ import { webhookLogger } from './utils/logger';
 // Import Routers
 import rulesRouter from './routers/rules';
 import researchRouter from './routers/research';
-import githubRouter from './routers/github';
+import integrationsRouter from './routers/integrations';
 import aiSearchRouter from './routers/ai_search';
-import appSearchRouter from './routers/app_search';
 import fdaRouter from './routers/fda';
 import weatherRouter from './routers/weather';
 
@@ -39,9 +38,8 @@ webhookLogger.log('Delema API (Node.js) is starting up...', 'SYSTEM');
 const apiPrefix = '/api/v1';
 app.use(`${apiPrefix}/rules`, rulesRouter);
 app.use(`${apiPrefix}/research`, researchRouter);
-app.use(`${apiPrefix}/github`, githubRouter);
+app.use(`${apiPrefix}/integrations`, integrationsRouter);
 app.use(`${apiPrefix}/ai`, aiSearchRouter);
-app.use(`${apiPrefix}/apps`, appSearchRouter);
 app.use(`${apiPrefix}/fda`, fdaRouter);
 app.use(`${apiPrefix}/weather`, weatherRouter);
 
@@ -301,22 +299,23 @@ app.get('/', (req, res) => {
             ]
           },
           {
-            category: "AI & Smart Search",
+            category: "AI Search",
             endpoints: [
-              { path: "/ai/search-products", name: "AI PRODUCT SEARCH", method: "POST", desc: "Rekomendasi produk pintar berbasis AI.", body: { query: "macbook air", limit: 3 } }
+              { path: "/ai/search", name: "AI SEARCH", method: "POST", desc: "Pencarian pintar berbasis AI untuk berbagai konten.", body: { query: "macbook air", limit: 3 } }
             ]
           },
           {
-            category: "Apps & Stores",
+            category: "Developer Integrations",
             endpoints: [
-              { path: "/apps/github", name: "GITHUB APPS", method: "POST", desc: "Cari aplikasi Android di GitHub.", body: { query: "browser", limit: 5 } }
+              { path: "/integrations/github", name: "GITHUB SEARCH", method: "POST", desc: "Cari aplikasi dan repository di GitHub.", body: { query: "browser", limit: 5 } },
+              { path: "/integrations/github/scan", name: "REPO SCANNER", method: "POST", desc: "Scan file markdown di repository GitHub.", body: { owner: "razaeldotexe", repo: "delema-api", path: "" } },
+              { path: "/integrations/github/content", name: "REPO CONTENT", method: "POST", desc: "Ambil isi file dari repository GitHub.", body: { owner: "razaeldotexe", repo: "delema-api", path: "README.md" } }
             ]
           },
           {
             category: "Utilities",
             endpoints: [
-              { path: "/weather", name: "WEATHER", method: "GET", desc: "Dapatkan data cuaca real-time.", body: null, queryParams: "city=Jakarta" },
-              { path: "/github/scan", name: "REPO SCANNER", method: "POST", desc: "Scan file markdown di repository GitHub.", body: { owner: "razaeldotexe", repo: "delema-api", path: "" } }
+              { path: "/weather", name: "WEATHER", method: "GET", desc: "Dapatkan data cuaca real-time.", body: null, queryParams: "city=Jakarta" }
             ]
           }
         ];

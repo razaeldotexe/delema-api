@@ -6,7 +6,7 @@ import { tryGemini, tryGroq, tryOpenRouter } from '../utils/ai_helper';
 
 const router = Router();
 
-router.post('/search-products', async (req: Request, res: Response) => {
+router.post('/search', async (req: Request, res: Response) => {
   const validation = ProductSearchRequestSchema.safeParse(req.body);
   if (!validation.success) {
     return res.status(422).json({ detail: validation.error.errors });

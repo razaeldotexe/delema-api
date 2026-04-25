@@ -1,13 +1,49 @@
 import { Router, Request, Response } from 'express';
 import axios from 'axios';
-import { GitHubScanRequestSchema, GitHubContentRequestSchema } from '../types/schemas';
+import { 
+  AppSearchRequestSchema, 
+  GitHubScanRequestSchema, 
+  GitHubContentRequestSchema 
+} from '../types/schemas';
 
 const router = Router();
 
 /**
- * Scans a GitHub repository for files.
+ * Search for Android applications on GitHub.
+ * Formerly POST /apps/github
  */
-router.post('/scan', async (req: Request, res: Response) => {
+router.post('/github', async (req: Request, res: Response) => {
+  const validation = AppSearchRequestSchema.safeParse(req.body);
+  if (!validation.success) {
+    return res.status(422).json({ detail: validation.error.errors });
+  }
+
+  const { query, limit = 10 } = validation.data;
+  const searchQuery = `${query} topic:android`;
+  const url = `https://api.github.com/search/repositories?q=${encodeURIComponent(searchQuery)}&per_page=${limit}`;
+  const headers = { Accept: 'application/vnd.github.v3+json', 'User-Agent': 'Delema-API-NodeJS' };
+
+  try {
+    const response = await axios.get(url, { headers, timeout: 10000 });
+    const items = response.data.items || [];
+    const results = items.map((repo: any) => ({
+      name: repo.full_name || repo.name,
+      summary: repo.description,
+      icon_url: repo.owner?.avatar_url,
+      url: repo.html_url,
+      source: 'github',
+    }));
+    return res.json(results);
+  } catch (error: any) {
+    return res.status(error.response?.status || 500).json({ detail: error.message });
+  }
+});
+
+/**
+ * Scans a GitHub repository for files.
+ * Formerly POST /github/scan
+ */
+router.post('/github/scan', async (req: Request, res: Response) => {
   const validation = GitHubScanRequestSchema.safeParse(req.body);
   if (!validation.success) {
     return res.status(422).json({ detail: validation.error.errors });
@@ -49,8 +85,9 @@ router.post('/scan', async (req: Request, res: Response) => {
 
 /**
  * Fetches the content of a file from GitHub.
+ * Formerly POST /github/content
  */
-router.post('/content', async (req: Request, res: Response) => {
+router.post('/github/content', async (req: Request, res: Response) => {
   const validation = GitHubContentRequestSchema.safeParse(req.body);
   if (!validation.success) {
     return res.status(422).json({ detail: validation.error.errors });
