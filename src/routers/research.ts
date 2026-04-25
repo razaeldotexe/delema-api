@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
 import wikipedia from 'wikipedia';
-import { search } from 'arxiv-client';
+import arxivClient, { all } from 'arxiv-client';
 import { SearchRequestSchema } from '../types/schemas';
 import { tryGemini, tryGroq, tryOpenRouter } from '../utils/ai_helper';
 import { webhookLogger } from '../utils/logger';
@@ -16,17 +16,13 @@ router.post('/arxiv', async (req: Request, res: Response) => {
     return res.status(422).json({ detail: validation.error.errors });
   }
 
-  const { query, limit } = validation.data;
+  const { query, limit = 10 } = validation.data;
 
   try {
-    const results = await search({
-      searchQueryParams: [
-        {
-          include: [{ name: query }],
-        },
-      ],
-      maxResults: limit,
-    });
+    const results = await arxivClient
+      .query(all(query))
+      .maxResults(limit)
+      .execute();
 
     const papers = results.map((paper: any) => ({
       title: paper.title,
