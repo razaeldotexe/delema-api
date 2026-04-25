@@ -255,19 +255,9 @@ app.get('/', (req, res) => {
           <div class="logo-bar"></div>
           <span class="logo-text">DELEMA API</span>
         </div>
-        <div class="nav-item"><i class="fas fa-bars"></i></div>
       </header>
 
-      <section class="hero">
-        <h1>
-          <span class="text-white">API</span>
-          <span class="accent">CONSOLE</span>
-          <span class="version">V3</span>
-        </h1>
-        <p>Direct Endpoint Execution Environment</p>
-      </section>
-
-      <div class="search-container">
+      <div class="search-container" style="padding-top: 3rem;">
         <div class="search-box">
           <i class="fas fa-search"></i>
           <input type="text" id="endpoint-search" placeholder="FILTER ENDPOINTS..." onkeyup="filterEndpoints()">
