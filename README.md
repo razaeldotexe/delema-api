@@ -1,92 +1,73 @@
 # Delema API
 
-Delema API is a specialized decision-support engine designed to help developers handle complex logic, recommendations, and automated choices. Originally written in Python/FastAPI, it is now a high-performance **Node.js** API built with **TypeScript**, **Express**, and **Zod**.
+Delema API adalah *decision-support engine* yang dirancang untuk menangani logika kompleks, riset berbasis AI, dan pengambilan data terstruktur. Awalnya ditulis dalam Python/FastAPI, kini telah bermigrasi sepenuhnya ke **Node.js** berperforma tinggi menggunakan **TypeScript**, **Express**, dan **Zod**.
 
-## Key Features
+## Fitur Utama
 
-### Recommendations & Scoring
+### 🧠 Smart Research & AI
+- **ArXiv Synthesis**: Cari publikasi ilmiah dengan ringkasan otomatis berbasis AI (Gemini/Groq).
+- **Wikipedia Intelligence**: Ambil data ensiklopedia dengan dukungan *fallback* otomatis antara bahasa Inggris dan Indonesia.
+- **Hybrid AI Search**: Pencarian produk dan konten pintar yang menggabungkan data real-time dan pemrosesan LLM.
 
-- **Weighted Scoring**: Rank items based on multiple weighted features.
-- **Dynamic Prioritization**: Calculate importance scores on-the-fly for feeds or search results.
+### 🏥 Healthcare Data
+- **OpenFDA Integration**: Akses cepat ke database FDA untuk informasi obat (*drug*), makanan (*food*), dan perangkat medis (*device*).
 
-### Business Logic & Rules Engine
+### 🛠 Utilities
+- **Hyper-local Weather**: Data cuaca real-time berdasarkan kota atau koordinat geografis menggunakan Open-Meteo.
 
-- **Boolean Evaluation**: Evaluate complex, nested AND/OR conditions against input facts.
-- **Decision Trees**: Traverse JSON-based decision trees to automate multi-step logic.
-- **Rich Operators**: Supports `=`, `!=`, `>`, `<`, `>=`, `<=`, `IN`, and `NOT IN`.
+## Struktur API (v1)
 
-### Automated Choices & Routing
+Semua *endpoint* menggunakan prefix: `{domain}/api/delema/v1/`
 
-- **Deterministic A/B Testing**: Consistent variant assignment using hashing (MD5).
-- **Weighted Distribution**: Route users to different features or configurations based on custom percentages.
+### Research
+- `POST /research/arxiv`: Pencarian jurnal ilmiah + Ringkasan AI.
+- `POST /research/wikipedia`: Informasi ensiklopedia + Ringkasan AI.
 
-## API Endpoints (v1)
+### AI Search
+- `POST /ai/search`: Rekomendasi dan pencarian pintar berbasis AI.
 
-### Recommendations
+### Healthcare
+- `POST /fda/search`: Pencarian data regulasi OpenFDA.
 
-- `POST /api/delema/v1/recommend/score`: Ranks items based on weighted features.
+### Utilities
+- `GET /weather`: Informasi cuaca terkini (mendukung param `city` atau `lat`/`lon`).
 
-### Rules Engine
+## Teknologi Utama
+- **Runtime**: Node.js 18+
+- **Bahasa**: TypeScript
+- **Framework**: Express.js
+- **Validasi**: Zod (Rigorously typed request/response)
+- **AI Engine**: Gemini, Groq, & OpenRouter
 
-- `POST /api/delema/v1/rules/evaluate`: Evaluates logical rulesets against facts.
-- `POST /api/delema/v1/rules/decision-tree`: Traverses a decision tree to return an outcome.
+## Memulai
 
-### Automated Routing
-
-- `POST /api/delema/v1/routing/ab-test`: Assigns a user to a variant deterministically.
-
-## Getting Started
-
-### Prerequisites
-
+### Prasyarat
 - **Node.js 18+**
-- **pnpm** (recommended)
+- **pnpm** (disarankan)
 
-### Environment Configuration
-
-This API uses `dotenv` for secret management. **Never commit your `.env` file to the repository.**
-
-1. Copy the example file to `.env`:
-   ```bash
-   cp .env.example .env
-   ```
-2. Edit `.env` and fill in your configuration:
-   - `PORT`: The port the server will run on (default: 8000).
-   - `WEBHOOK_URL`: (Optional) A Discord or Slack webhook URL for asynchronous log batching.
-   - `NODE_ENV`: Set to `production` for deployment.
-
-### Installation
-
-1. Clone the repository:
+### Instalasi & Konfigurasi
+1. Clone repository:
    ```bash
    git clone git@github.com:razaeldotexe/delema-api.git
    cd delema-api
    ```
-2. Install dependencies:
+2. Instal dependensi:
    ```bash
    pnpm install
    ```
-3. Build the project:
-   ```bash
-   pnpm run build
-   ```
-4. Run the server:
-   ```bash
-   pnpm run start
-   ```
+3. Konfigurasi `.env`:
+   Salin `.env.example` ke `.env` dan isi kunci API yang diperlukan (GEMINI_API_KEY, GROQ_API_KEY, dll).
 
-### Testing
+### Menjalankan Server
+- **Development**: `pnpm run dev`
+- **Build**: `pnpm run build`
+- **Production**: `pnpm run start`
 
-Run the unit tests for core logic and scoring:
-
+## Pengujian
+Jalankan rangkaian tes unit untuk memastikan integritas logika dan endpoint:
 ```bash
 pnpm run test
 ```
 
-## Deployment
-
-This API is ready for deployment on **Railway**, **Render**, or any platform supporting **Nixpacks** or **Procfile**. The current configuration uses the bundled `Procfile` and `nixpacks.toml`.
-
 ---
-
-&copy; 2026 OpenZero Project.
+© 2026 OpenZero Project.
