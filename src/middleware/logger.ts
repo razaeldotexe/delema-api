@@ -28,13 +28,21 @@ export const requestLogger = (req: Request, res: Response, next: NextFunction) =
  * Global error handler middleware.
  */
 export const errorHandler = (err: any, req: Request, res: Response, _next: NextFunction) => {
-  const status = err.status || err.statusCode || 500;
-  const message = err.message || 'Internal Server Error';
+  let status = err.status || err.statusCode || 500;
+  let message = err.message || 'Internal Server Error';
+  let detail = undefined;
+
+  // Handle Zod validation errors
+  if (err.name === 'ZodError') {
+    status = 400;
+    message = 'Validation Error';
+    detail = err.errors;
+  }
 
   webhookLogger.log(`Unhandled Error: ${message}\nStack: ${err.stack}`, 'ERROR');
 
   res.status(status).json({
-    detail: message,
+    detail: detail || message,
     stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
   });
 };

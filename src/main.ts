@@ -9,6 +9,8 @@ import researchRouter from './routers/research';
 import aiSearchRouter from './routers/ai_search';
 import fdaRouter from './routers/fda';
 import weatherRouter from './routers/weather';
+import codeRouter from './routers/code';
+import docsRouter from './routers/docs';
 
 dotenv.config();
 
@@ -38,6 +40,8 @@ app.use(`${apiPrefix}/research`, researchRouter);
 app.use(`${apiPrefix}/ai`, aiSearchRouter);
 app.use(`${apiPrefix}/fda`, fdaRouter);
 app.use(`${apiPrefix}/weather`, weatherRouter);
+app.use(`${apiPrefix}/code`, codeRouter);
+app.use(`${apiPrefix}/docs`, docsRouter);
 
 // Root endpoint
 app.get('/', (req, res) => {
@@ -265,6 +269,16 @@ app.get('/', (req, res) => {
             category: "Utilities",
             endpoints: [
               { path: "/weather", name: "WEATHER", method: "GET", desc: "Dapatkan data cuaca real-time.", body: null, queryParams: "city=Jakarta" }
+            ]
+          },
+          {
+            category: "Developer Suite",
+            endpoints: [
+              { path: "/code/explain", name: "CODE EXPLAIN", method: "POST", desc: "Jelaskan potongan kode dengan AI.", body: { code: "console.log('hello')", language: "javascript" } },
+              { path: "/code/debug", name: "CODE DEBUG", method: "POST", desc: "Cari dan perbaiki bug dalam kode.", body: { code: "function add(a, b) { return a - b }", error: "Should add instead of subtract", language: "javascript" } },
+              { path: "/code/generate", name: "CODE GENERATE", method: "POST", desc: "Generate kode berdasarkan prompt.", body: { prompt: "Create a simple express server", language: "typescript", framework: "express" } },
+              { path: "/code/refactor", name: "CODE REFACTOR", method: "POST", desc: "Refactor kode untuk kualitas lebih baik.", body: { code: "var x = 10; if(x == 10) { console.log(x) }", instruction: "Use modern syntax", language: "javascript" } },
+              { path: "/docs", name: "DOCS SEARCH", method: "GET", desc: "Cari dokumentasi dan sintesis jawaban AI.", body: null, queryParams: "q=useEffect&framework=react" }
             ]
           }
         ];

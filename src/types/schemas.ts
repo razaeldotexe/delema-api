@@ -310,3 +310,44 @@ export const OutfitRatingResultSchema = z.object({
 });
 
 export type OutfitRatingResult = z.infer<typeof OutfitRatingResultSchema>;
+
+// --- Developer Suite ---
+
+export const CodeExplainSchema = z.object({
+  code: z.string().min(1),
+  language: z.string().optional(),
+  context: z.string().optional(),
+});
+
+export type CodeExplainRequest = z.infer<typeof CodeExplainSchema>;
+
+export const CodeDebugSchema = z.object({
+  code: z.string().min(1),
+  error: z.string().optional(),
+  language: z.string().optional(),
+});
+
+export type CodeDebugRequest = z.infer<typeof CodeDebugSchema>;
+
+export const CodeGenerateSchema = z.object({
+  prompt: z.string().min(1),
+  language: z.string().min(1),
+  framework: z.string().optional(),
+});
+
+export type CodeGenerateRequest = z.infer<typeof CodeGenerateSchema>;
+
+export const CodeRefactorSchema = z.object({
+  code: z.string().min(1),
+  instruction: z.string().optional(),
+  language: z.string().optional(),
+});
+
+export type CodeRefactorRequest = z.infer<typeof CodeRefactorSchema>;
+
+export const DocsLookupSchema = z.object({
+  query: z.string().min(1),
+  framework: z.string().optional(),
+});
+
+export type DocsLookupRequest = z.infer<typeof DocsLookupSchema>;
