@@ -16,7 +16,7 @@ export class DocsScraper {
   /**
    * Search for documentation based on query and optional framework.
    */
-  async search(query: string, framework?: string): Promise<DocsResult> {
+  async search(query: string, framework?: string | null): Promise<DocsResult> {
     try {
       webhookLogger.info(
         `Searching docs for: ${query} (Framework: ${framework || 'None'})`
@@ -48,7 +48,8 @@ export class DocsScraper {
   /**
    * Attempts to guess the documentation URL for common frameworks.
    */
-  private async tryDirectHit(query: string, framework: string): Promise<DocsResult | null> {
+  private async tryDirectHit(query: string, framework?: string | null): Promise<DocsResult | null> {
+    if (!framework) return null;
     const fw = framework.toLowerCase();
     let url = '';
 
@@ -77,7 +78,7 @@ export class DocsScraper {
   /**
    * Fallback search using DuckDuckGo with site restriction.
    */
-  private async fallbackSearch(query: string, framework?: string): Promise<DocsResult> {
+  private async fallbackSearch(query: string, framework?: string | null): Promise<DocsResult> {
     let searchQuery = query;
     if (framework) {
       const site = this.getSiteForFramework(framework);
@@ -148,7 +149,8 @@ export class DocsScraper {
   /**
    * Maps framework names to their primary documentation domains.
    */
-  private getSiteForFramework(framework: string): string {
+  private getSiteForFramework(framework?: string | null): string {
+    if (!framework) return '';
     const fw = framework.toLowerCase();
     switch (fw) {
       case 'react':
