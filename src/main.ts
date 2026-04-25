@@ -5,16 +5,13 @@ import { requestLogger, errorHandler } from './middleware/logger';
 import { webhookLogger } from './utils/logger';
 
 // Import Routers
-import recommendationsRouter from './routers/recommendations';
 import rulesRouter from './routers/rules';
-import routingRouter from './routers/routing';
 import researchRouter from './routers/research';
 import githubRouter from './routers/github';
 import aiSearchRouter from './routers/ai_search';
 import appSearchRouter from './routers/app_search';
 import fdaRouter from './routers/fda';
 import weatherRouter from './routers/weather';
-import outfitRouter from './routers/outfit';
 
 dotenv.config();
 
@@ -40,16 +37,13 @@ webhookLogger.log('Delema API (Node.js) is starting up...', 'SYSTEM');
 
 // Routes
 const apiPrefix = '/api/v1';
-app.use(`${apiPrefix}/recommendations`, recommendationsRouter);
 app.use(`${apiPrefix}/rules`, rulesRouter);
-app.use(`${apiPrefix}/routing`, routingRouter);
 app.use(`${apiPrefix}/research`, researchRouter);
 app.use(`${apiPrefix}/github`, githubRouter);
 app.use(`${apiPrefix}/ai`, aiSearchRouter);
 app.use(`${apiPrefix}/apps`, appSearchRouter);
 app.use(`${apiPrefix}/fda`, fdaRouter);
 app.use(`${apiPrefix}/weather`, weatherRouter);
-app.use(`${apiPrefix}/outfit`, outfitRouter);
 
 // Root endpoint
 app.get('/', (req, res) => {
@@ -303,30 +297,26 @@ app.get('/', (req, res) => {
             endpoints: [
               { path: "/research/arxiv", name: "ARXIV SEARCH", method: "POST", desc: "Cari publikasi ilmiah di ArXiv dengan ringkasan AI.", body: { query: "machine learning", limit: 5 } },
               { path: "/research/wikipedia", name: "WIKIPEDIA", method: "POST", desc: "Ambil ringkasan ensiklopedia dan sintesis AI.", body: { query: "Node.js" } },
-              { path: "/recommendations/score", name: "WEIGHTED SCORE", method: "POST", desc: "Hitung skor berbobot untuk daftar item.", body: { items: [{id: 1, price: 100}, {id: 2, price: 50}], weights: {price: -1} } }
+              { path: "/rules/evaluate", name: "RULES ENGINE", method: "POST", desc: "Evaluasi ruleset kompleks terhadap data fakta.", body: { ruleset: { condition: "AND", rules: [{ field: "age", operator: ">=", value: 18 }] }, facts: { age: 20 } } }
             ]
           },
           {
             category: "AI & Smart Search",
             endpoints: [
-              { path: "/ai/search-products", name: "AI PRODUCT SEARCH", method: "POST", desc: "Rekomendasi produk pintar berbasis AI.", body: { query: "macbook air", limit: 3 } },
-              { path: "/ai/app-availability", name: "APP CHECKER", method: "POST", desc: "Cek ketersediaan aplikasi di berbagai platform.", body: { query: "Genshin Impact" } },
-              { path: "/outfit/rate", name: "OUTFIT RATER", method: "POST", desc: "Rating pakaian menggunakan Vision AI.", body: { image_url: "https://example.com/outfit.jpg", context: "casual" } }
+              { path: "/ai/search-products", name: "AI PRODUCT SEARCH", method: "POST", desc: "Rekomendasi produk pintar berbasis AI.", body: { query: "macbook air", limit: 3 } }
             ]
           },
           {
             category: "Apps & Stores",
             endpoints: [
-              { path: "/apps/appstore", name: "APPLE APP STORE", method: "POST", desc: "Cari aplikasi di iOS App Store.", body: { query: "discord" } },
-              { path: "/apps/fdroid", name: "F-DROID", method: "POST", desc: "Cari aplikasi open source di F-Droid.", body: { query: "browser" } },
-              { path: "/apps/trending", name: "TRENDING APPS", method: "POST", desc: "Dapatkan aplikasi populer dari GitHub/F-Droid.", body: { source: "github", limit: 10 } }
+              { path: "/apps/github", name: "GITHUB APPS", method: "POST", desc: "Cari aplikasi Android di GitHub.", body: { query: "browser", limit: 5 } }
             ]
           },
           {
             category: "Utilities",
             endpoints: [
               { path: "/weather", name: "WEATHER", method: "GET", desc: "Dapatkan data cuaca real-time.", body: null, queryParams: "city=Jakarta" },
-              { path: "/routing/ab-test", name: "A/B TESTING", method: "POST", desc: "Assignment varian user secara deterministik.", body: { user_id: "u123", variants: [{name: "A", weight: 50}, {name: "B", weight: 50}] } }
+              { path: "/github/scan", name: "REPO SCANNER", method: "POST", desc: "Scan file markdown di repository GitHub.", body: { owner: "razaeldotexe", repo: "delema-api", path: "" } }
             ]
           }
         ];
