@@ -5,6 +5,9 @@ import { SearchRequestSchema } from '../types/schemas';
 import { tryGemini, tryGroq, tryOpenRouter } from '../utils/ai_helper';
 import { webhookLogger } from '../utils/logger';
 
+// Set User-Agent for Wikipedia API to avoid 403 Forbidden errors
+wikipedia.setUserAgent('DelemaAPI/1.0 (https://delema.razael-fox.my.id; contact@razael-fox.my.id)');
+
 const router = Router();
 
 /**
