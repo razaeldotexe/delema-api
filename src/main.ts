@@ -6,7 +6,6 @@ import { webhookLogger } from './utils/logger';
 
 // Import Routers
 import researchRouter from './routers/research';
-import integrationsRouter from './routers/integrations';
 import aiSearchRouter from './routers/ai_search';
 import fdaRouter from './routers/fda';
 import weatherRouter from './routers/weather';
@@ -36,7 +35,6 @@ webhookLogger.log('Delema API (Node.js) is starting up...', 'SYSTEM');
 // Routes
 const apiPrefix = '/api/v1';
 app.use(`${apiPrefix}/research`, researchRouter);
-app.use(`${apiPrefix}/integrations`, integrationsRouter);
 app.use(`${apiPrefix}/ai`, aiSearchRouter);
 app.use(`${apiPrefix}/fda`, fdaRouter);
 app.use(`${apiPrefix}/weather`, weatherRouter);
@@ -261,14 +259,6 @@ app.get('/', (req, res) => {
             category: "AI Search",
             endpoints: [
               { path: "/ai/search", name: "AI SEARCH", method: "POST", desc: "Pencarian pintar berbasis AI untuk berbagai konten.", body: { query: "macbook air", limit: 3 } }
-            ]
-          },
-          {
-            category: "Developer Integrations",
-            endpoints: [
-              { path: "/integrations/github", name: "GITHUB SEARCH", method: "POST", desc: "Cari aplikasi dan repository di GitHub.", body: { query: "browser", limit: 5 } },
-              { path: "/integrations/github/scan", name: "REPO SCANNER", method: "POST", desc: "Scan file markdown di repository GitHub.", body: { owner: "razaeldotexe", repo: "delema-api", path: "" } },
-              { path: "/integrations/github/content", name: "REPO CONTENT", method: "POST", desc: "Ambil isi file dari repository GitHub.", body: { owner: "razaeldotexe", repo: "delema-api", path: "README.md" } }
             ]
           },
           {
