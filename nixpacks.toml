@@ -3,10 +3,10 @@ nixPkgs = ["nodejs", "pnpm", "playwright-driver"]
 
 [phases.build]
 dependsOn = ["setup"]
-cmds = ["pnpm install && PLAYWRIGHT_BROWSERS_PATH=0 npx playwright install --with-deps chromium && pnpm run build"]
+cmds = ["pnpm install", "PLAYWRIGHT_BROWSERS_PATH=./pw-browsers npx playwright install --with-deps chromium", "pnpm run build"]
 
 [start]
 cmd = "node dist/main.js"
 
 [variables]
-PLAYWRIGHT_BROWSERS_PATH = "0"
+PLAYWRIGHT_BROWSERS_PATH = "./pw-browsers"
