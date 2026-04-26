@@ -67,6 +67,11 @@ const commonHead = `
       <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
       <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/json.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/javascript.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/typescript.min.js"></script>
       <style>
         :root {
           --bg-main: #0d1117;
@@ -331,10 +336,26 @@ app.get('/', (req, res) => {
             const data = await res.json();
             resStatus.textContent = res.status + ' ' + res.statusText + ' (' + duration + 'ms)';
             resStatus.className = 'response-status ' + (res.ok ? 'status-success' : 'status-error');
-            let bodyHtml = '';
-            if (data.ai_summary) { bodyHtml += '<div style="background: rgba(79, 70, 229, 0.08); border-left: 4px solid var(--primary); padding: 1.25rem; margin-bottom: 1.5rem; border-radius: 4px; color: var(--text-white); font-style: italic; line-height: 1.6; font-size: 0.95rem;">' + data.ai_summary + '</div>'; }
-            bodyHtml += JSON.stringify(data, null, 2);
-            resBody.innerHTML = bodyHtml;
+            
+            let responseText = JSON.stringify(data, null, 2);
+            resBody.innerHTML = '';
+            
+            if (data.ai_summary) { 
+              const summaryDiv = document.createElement('div');
+              summaryDiv.style.cssText = 'background: rgba(79, 70, 229, 0.08); border-left: 4px solid var(--primary); padding: 1.25rem; margin-bottom: 1.5rem; border-radius: 4px; color: var(--text-white); font-style: italic; line-height: 1.6; font-size: 0.95rem;';
+              summaryDiv.textContent = data.ai_summary;
+              resBody.appendChild(summaryDiv);
+            }
+            
+            const pre = document.createElement('pre');
+            pre.className = 'language-json';
+            pre.style.margin = '0';
+            pre.style.padding = '0';
+            pre.style.background = 'transparent';
+            pre.textContent = responseText;
+            resBody.appendChild(pre);
+            
+            hljs.highlightElement(pre);
           } catch (err) { 
             resStatus.textContent = 'CONNECTION ERROR'; 
             resStatus.className = 'response-status status-error'; 
@@ -411,7 +432,7 @@ app.get('/api-docs', (req, res) => {
         <p>Endpoint production berada di rute berikut:</p>
         <div class="code-block-wrapper">
           <button class="copy-btn" onclick="copyText(this)"><i class="far fa-copy"></i> Copy</button>
-          <pre><code>https://delema.razael-fox.my.id/api/delema/v1</code></pre>
+          <pre><code class="language-http">https://delema.razael-fox.my.id/api/delema/v1</code></pre>
         </div>
         <h2>Rate Limiting</h2>
         <p>Batas penggunaan dibedakan berdasarkan kompleksitas tugas:</p>
@@ -424,7 +445,7 @@ app.get('/api-docs', (req, res) => {
         <p>Format respons standar menggunakan JSON. Field <code>ai_summary</code> berisi sintesis cerdas dari data riil yang ditemukan.</p>
         <div class="code-block-wrapper">
           <button class="copy-btn" onclick="copyText(this)"><i class="far fa-copy"></i> Copy</button>
-          <pre><code>{
+          <pre><code class="language-json">{
   "results": [...],
   "ai_summary": "TL;DR: Sintesis pintar dari data penelitian terkini.",
   "engine": "playwright-alpha"
@@ -434,7 +455,7 @@ app.get('/api-docs', (req, res) => {
         <p>Contoh pemanggilan API menggunakan JavaScript modern:</p>
         <div class="code-block-wrapper">
           <button class="copy-btn" onclick="copyText(this)"><i class="far fa-copy"></i> Copy</button>
-          <pre><code>// Example: AI Search Alpha (Deep Search)
+          <pre><code class="language-javascript">// Example: AI Search Alpha (Deep Search)
 const callAlpha = async () => {
   const res = await fetch('https://delema.razael-fox.my.id/api/delema/v1/ai/alpha/search', {
     method: 'POST',
@@ -451,6 +472,11 @@ const callAlpha = async () => {
       </div>
       ${commonFooter}
       <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+          document.querySelectorAll('pre code').forEach((el) => {
+            hljs.highlightElement(el);
+          });
+        });
         document.getElementById('nav-docs').style.color = 'var(--text-white)';
         document.getElementById('nav-docs').style.background = 'var(--bg-hover)';
         function copyText(btn) {
