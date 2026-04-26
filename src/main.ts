@@ -203,6 +203,7 @@ app.get('/', (req, res) => {
         .status-error { background: rgba(248, 81, 73, 0.12); color: #f85149; }
         .response-body-wrapper { position: relative; border-radius: 10px; overflow: hidden; border: 1px solid var(--border); width: 100%; max-width: 100%; box-sizing: border-box; }
         .response-body { background: #010409; color: #e6edf3; padding: 1.5rem; font-family: var(--font-mono); font-size: 0.9rem; max-height: 600px; overflow: auto; white-space: pre-wrap; line-height: 1.6; word-break: break-all; overflow-wrap: anywhere; }
+        .response-body pre { white-space: pre-wrap !important; word-break: break-all !important; overflow-wrap: anywhere !important; }
         .response-body-wrapper .copy-btn { position: absolute; top: 1rem; right: 1rem; z-index: 10; opacity: 0.5; }
         .response-body-wrapper:hover .copy-btn { opacity: 1; }
         .empty-state { text-align: center; padding: 5rem 2rem; background: var(--bg-card); border-radius: var(--radius); border: 1px dashed var(--border); margin-top: 2rem; }
@@ -361,6 +362,8 @@ app.get('/', (req, res) => {
             pre.style.margin = '0';
             pre.style.padding = '0';
             pre.style.background = 'transparent';
+            pre.style.whiteSpace = 'pre-wrap';
+            pre.style.wordBreak = 'break-all';
             pre.textContent = responseText;
             resBody.appendChild(pre);
             
