@@ -8,6 +8,13 @@ export interface ProductResult {
   source_name: string;
 }
 
+export interface SearchResult {
+  title: string;
+  snippet: string;
+  url: string;
+  source: string;
+}
+
 /**
  * Mengambil data produk riil dari DuckDuckGo Search (Shopping/Web results).
  */
@@ -37,6 +44,38 @@ export async function fetchRealProducts(query: string, maxResults = 5): Promise<
   } catch (error) {
     webhookLogger.error(
       `Scraper failed: ${error instanceof Error ? error.message : String(error)}`
+    );
+  }
+
+  return results;
+}
+
+/**
+ * Mengambil hasil pencarian web umum dari DuckDuckGo.
+ */
+export async function fetchWebResults(query: string, maxResults = 5): Promise<SearchResult[]> {
+  const results: SearchResult[] = [];
+  try {
+    webhookLogger.info(`Fetching web results for: ${query}`);
+
+    let count = 0;
+    for await (const r of ddgs.text(query)) {
+      if (count >= maxResults) break;
+
+      results.push({
+        title: r.title || 'Untitled',
+        snippet: r.body || 'No description available.',
+        url: r.href || '#',
+        source: 'DuckDuckGo',
+      });
+
+      count++;
+    }
+
+    webhookLogger.success(`Found ${results.length} web search results.`);
+  } catch (error) {
+    webhookLogger.error(
+      `Web Search Scraper failed: ${error instanceof Error ? error.message : String(error)}`
     );
   }
 

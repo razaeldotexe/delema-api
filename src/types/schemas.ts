@@ -98,6 +98,22 @@ export const ProductResultSchema = z.object({
 
 export type ProductResult = z.infer<typeof ProductResultSchema>;
 
+// --- Search Browser ---
+
+export const SearchResultItemSchema = z.object({
+  title: z.string(),
+  snippet: z.string(),
+  url: z.string(),
+  source: z.string().optional().default('Web Result'),
+});
+
+export const AISearchResultSchema = z.object({
+  results: z.array(SearchResultItemSchema),
+  ai_summary: z.string().optional(),
+});
+
+export type AISearchResult = z.infer<typeof AISearchResultSchema>;
+
 // --- App Search ---
 
 export const AppSearchRequestSchema = z.object({
