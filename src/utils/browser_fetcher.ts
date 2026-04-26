@@ -45,18 +45,18 @@ export async function searchWithBrowser(query: string, limit = 5): Promise<Brows
         timeout: 20000
       });
 
-      // Handle "Before you continue" / Consent screen if it appears
-      const consentBtn = await page.$('button:has-text("Accept all"), button:has-text("I agree")');
+      const consentBtn = await page.$('button:has-text("Accept all"), button:has-text("I agree"), #L2AGLb');
       if (consentBtn) await consentBtn.click();
 
-      // Wait for results with a more flexible selector
-      await page.waitForSelector('#search, .g, #rso', { timeout: 10000 });
+      // Flexible wait for any result-like element
+      await page.waitForSelector('div.g, #rso, div[data-hveid]', { timeout: 10000 });
+      await page.waitForTimeout(1000); // Small breath for JS
 
-      const extracted = await page.$$eval('div.g', (elements) => {
+      const extracted = await page.$$eval('div.g, .tF2Cxc', (elements) => {
         return elements.map(el => {
           const titleEl = el.querySelector('h3');
           const linkEl = el.querySelector('a');
-          const snippetEl = el.querySelector('div[style*="-webkit-line-clamp"], .VwiC3b');
+          const snippetEl = el.querySelector('div[style*="-webkit-line-clamp"], .VwiC3b, .kb0N9d');
 
           return {
             title: titleEl?.textContent || '',
@@ -67,45 +67,77 @@ export async function searchWithBrowser(query: string, limit = 5): Promise<Brows
       });
 
       if (extracted.length > 0) {
-        webhookLogger.success(`[Alpha] Google extraction success: ${extracted.length} results.`);
-        extracted.slice(0, limit).forEach(item => {
-          results.push({ ...item, source: 'Google (Alpha)' });
+        webhookLogger.success(`[Alpha] Google success: ${extracted.length} results.`);
+        extracted.slice(0, limit).forEach(item => results.push({ ...item, source: 'Google (Alpha)' }));
+        return results;
+      }
+    } catch (err) {
+      webhookLogger.warn(`[Alpha] Google failed. Trying DuckDuckGo...`);
+    }
+
+    // 2. Try DuckDuckGo
+    try {
+      await page.goto(`https://duckduckgo.com/?q=${encodeURIComponent(query)}&ia=web`, {
+        waitUntil: 'networkidle',
+        timeout: 15000
+      });
+      
+      const ddgResults = await page.$$eval('article, .result', (elements) => {
+        return elements.map(el => {
+          const titleEl = el.querySelector('.result__title, [data-testid="result-title-a"]');
+          const linkEl = el.querySelector('.result__a, [data-testid="result-title-a"]');
+          const snippetEl = el.querySelector('.result__snippet, [data-testid="result-snippet"]');
+
+          return {
+            title: titleEl?.textContent || '',
+            url: linkEl?.getAttribute('href') || '',
+            snippet: snippetEl?.textContent || ''
+          };
+        }).filter(item => item.title && item.url);
+      });
+
+      if (ddgResults.length > 0) {
+        webhookLogger.success(`[Alpha] DDG success: ${ddgResults.length} results.`);
+        ddgResults.slice(0, limit).forEach(item => {
+          results.push({
+            title: item.title,
+            snippet: item.snippet,
+            url: item.url.startsWith('http') ? item.url : `https:${item.url}`,
+            source: 'DuckDuckGo (Alpha)'
+          });
         });
         return results;
       }
-    } catch (googleError) {
-      webhookLogger.warn(`[Alpha] Google failed/blocked: ${googleError instanceof Error ? googleError.message : 'Timeout'}. Trying DuckDuckGo...`);
+    } catch (err) {
+      webhookLogger.warn(`[Alpha] DDG failed. Trying Brave Search...`);
     }
 
-    // 2. Fallback to DuckDuckGo (Browser version - less bot protection)
-    await page.goto(`https://duckduckgo.com/?q=${encodeURIComponent(query)}&t=h_&ia=web`, {
-      waitUntil: 'networkidle',
-      timeout: 20000
-    });
-
-    const ddgResults = await page.$$eval('.result', (elements) => {
-      return elements.map(el => {
-        const titleEl = el.querySelector('.result__title, .result__a');
-        const linkEl = el.querySelector('.result__a');
-        const snippetEl = el.querySelector('.result__snippet');
-
-        return {
-          title: titleEl?.textContent || '',
-          url: linkEl?.getAttribute('href') || '',
-          snippet: snippetEl?.textContent || ''
-        };
-      }).filter(item => item.title && item.url);
-    });
-
-    webhookLogger.success(`[Alpha] DuckDuckGo extraction success: ${ddgResults.length} results.`);
-    ddgResults.slice(0, limit).forEach(item => {
-      results.push({
-        title: item.title,
-        snippet: item.snippet,
-        url: item.url.startsWith('http') ? item.url : `https:${item.url}`,
-        source: 'DuckDuckGo (Alpha)'
+    // 3. Final Fallback: Brave Search (Very scraper friendly)
+    try {
+      await page.goto(`https://search.brave.com/search?q=${encodeURIComponent(query)}`, {
+        waitUntil: 'domcontentloaded',
+        timeout: 15000
       });
-    });
+
+      const braveResults = await page.$$eval('.snippet', (elements) => {
+        return elements.map(el => {
+          const titleEl = el.querySelector('.title');
+          const linkEl = el.querySelector('a');
+          const snippetEl = el.querySelector('.snippet-content, .snippet-description');
+
+          return {
+            title: titleEl?.textContent || '',
+            url: linkEl?.href || '',
+            snippet: snippetEl?.textContent || ''
+          };
+        }).filter(item => item.title && item.url);
+      });
+
+      webhookLogger.success(`[Alpha] Brave success: ${braveResults.length} results.`);
+      braveResults.slice(0, limit).forEach(item => results.push({ ...item, source: 'Brave (Alpha)' }));
+    } catch (err: any) {
+      webhookLogger.error(`[Alpha] All search engines failed: ${err.message}`);
+    }
 
   } catch (error: any) {
     webhookLogger.error(`[Alpha] Browser Search failed: ${error.message}`);
