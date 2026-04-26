@@ -70,7 +70,11 @@ const commonHead = `
       <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/material-palenight.min.css">
       <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/javascript/javascript.min.js"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/json.min.js"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/javascript.min.js"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/typescript.min.js"></script>
@@ -190,6 +194,8 @@ app.get('/', (req, res) => {
         .endpoint-desc { color: var(--text-main); font-size: 1rem; padding: 1.5rem 0; line-height: 1.7; }
         .form-label { display: block; color: var(--text-muted); font-size: 0.75rem; font-weight: 800; margin-bottom: 1rem; letter-spacing: 0.15em; text-transform: uppercase; }
         .input-field { width: 100%; background: #0d1117; border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; color: #c9d1d9; font-family: var(--font-mono); font-size: 0.95rem; box-sizing: border-box; outline: none; margin-bottom: 1.5rem; line-height: 1.6; resize: vertical; min-height: 120px; transition: all 0.2s; }
+        .CodeMirror { height: auto; min-height: 150px; background: #0d1117 !important; color: #c9d1d9 !important; font-family: var(--font-mono) !important; font-size: 0.95rem !important; border-radius: 10px; border: 1px solid var(--border); padding: 0.5rem; margin-bottom: 1.5rem; }
+        .CodeMirror-gutters { background: #0d1117 !important; border-right: 1px solid var(--border) !important; }
         .input-field:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
         .input-field::placeholder { color: #484f58; }
         .execute-btn { width: 100%; background: var(--primary); color: white; border: none; padding: 1.25rem; border-radius: 10px; font-weight: 800; font-size: 1rem; letter-spacing: 0.05em; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; align-items: center; justify-content: center; gap: 0.75rem; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2); }
