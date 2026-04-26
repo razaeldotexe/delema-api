@@ -38,39 +38,72 @@ export async function searchWithBrowser(query: string, limit = 5): Promise<Brows
 
     const page: Page = await context.newPage();
 
-    // Search on Google (often has better depth than DDG for Alpha version)
-    await page.goto(`https://www.google.com/search?q=${encodeURIComponent(query)}`, {
-      waitUntil: 'domcontentloaded',
-      timeout: 30000
+    // 1. Try Google Search
+    try {
+      await page.goto(`https://www.google.com/search?q=${encodeURIComponent(query)}`, {
+        waitUntil: 'domcontentloaded',
+        timeout: 20000
+      });
+
+      // Handle "Before you continue" / Consent screen if it appears
+      const consentBtn = await page.$('button:has-text("Accept all"), button:has-text("I agree")');
+      if (consentBtn) await consentBtn.click();
+
+      // Wait for results with a more flexible selector
+      await page.waitForSelector('#search, .g, #rso', { timeout: 10000 });
+
+      const extracted = await page.$$eval('div.g', (elements) => {
+        return elements.map(el => {
+          const titleEl = el.querySelector('h3');
+          const linkEl = el.querySelector('a');
+          const snippetEl = el.querySelector('div[style*="-webkit-line-clamp"], .VwiC3b');
+
+          return {
+            title: titleEl?.textContent || '',
+            url: linkEl?.href || '',
+            snippet: snippetEl?.textContent || ''
+          };
+        }).filter(item => item.title && item.url);
+      });
+
+      if (extracted.length > 0) {
+        webhookLogger.success(`[Alpha] Google extraction success: ${extracted.length} results.`);
+        extracted.slice(0, limit).forEach(item => {
+          results.push({ ...item, source: 'Google (Alpha)' });
+        });
+        return results;
+      }
+    } catch (googleError) {
+      webhookLogger.warn(`[Alpha] Google failed/blocked: ${googleError instanceof Error ? googleError.message : 'Timeout'}. Trying DuckDuckGo...`);
+    }
+
+    // 2. Fallback to DuckDuckGo (Browser version - less bot protection)
+    await page.goto(`https://duckduckgo.com/?q=${encodeURIComponent(query)}&t=h_&ia=web`, {
+      waitUntil: 'networkidle',
+      timeout: 20000
     });
 
-    // Wait for the results container
-    await page.waitForSelector('#search', { timeout: 10000 });
-
-    // Extract organic results
-    const extracted = await page.$$eval('div.g', (elements) => {
+    const ddgResults = await page.$$eval('.result', (elements) => {
       return elements.map(el => {
-        const titleEl = el.querySelector('h3');
-        const linkEl = el.querySelector('a');
-        const snippetEl = el.querySelector('div[style*="-webkit-line-clamp"]'); // Common snippet selector
-        const altSnippetEl = el.querySelector('.VwiC3b'); // Alternative snippet selector
+        const titleEl = el.querySelector('.result__title, .result__a');
+        const linkEl = el.querySelector('.result__a');
+        const snippetEl = el.querySelector('.result__snippet');
 
         return {
           title: titleEl?.textContent || '',
-          url: linkEl?.href || '',
-          snippet: snippetEl?.textContent || altSnippetEl?.textContent || ''
+          url: linkEl?.getAttribute('href') || '',
+          snippet: snippetEl?.textContent || ''
         };
       }).filter(item => item.title && item.url);
     });
 
-    webhookLogger.success(`[Alpha] Successfully extracted ${extracted.length} results.`);
-
-    extracted.slice(0, limit).forEach(item => {
+    webhookLogger.success(`[Alpha] DuckDuckGo extraction success: ${ddgResults.length} results.`);
+    ddgResults.slice(0, limit).forEach(item => {
       results.push({
         title: item.title,
         snippet: item.snippet,
-        url: item.url,
-        source: 'Google (Browser)'
+        url: item.url.startsWith('http') ? item.url : `https:${item.url}`,
+        source: 'DuckDuckGo (Alpha)'
       });
     });
 
