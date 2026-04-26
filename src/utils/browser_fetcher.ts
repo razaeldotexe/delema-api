@@ -18,21 +18,25 @@ export async function searchWithBrowser(query: string, limit = 5): Promise<Brows
 
   try {
     const possiblePaths = [
-      '/usr/bin/chromium',
       '/usr/bin/google-chrome',
-      '/usr/bin/chromium-browser',
-      'chromium',
-      'google-chrome'
+      '/usr/bin/chromium',
+      'google-chrome',
+      'chromium'
     ];
 
     let launchError = null;
     for (const path of possiblePaths) {
       try {
-        webhookLogger.debug(`[Alpha] Attempting to launch browser at: ${path}`);
+        webhookLogger.debug(`[Alpha] Attempting launch with executable: ${path}`);
         browser = await chromium.launch({ 
           headless: true,
           executablePath: path.includes('/') ? path : undefined,
-          args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
+          args: [
+            '--no-sandbox', 
+            '--disable-setuid-sandbox', 
+            '--disable-dev-shm-usage',
+            '--disable-gpu'
+          ]
         });
         if (browser) {
           webhookLogger.info(`[Alpha] Browser launched successfully using: ${path}`);
@@ -40,12 +44,14 @@ export async function searchWithBrowser(query: string, limit = 5): Promise<Brows
         }
       } catch (err: any) {
         launchError = err;
+        webhookLogger.warn(`[Alpha] Launch failed for ${path}: ${err.message}`);
         continue;
       }
     }
 
     if (!browser) {
-      throw new Error(`Could not launch browser from any known path. Last error: ${launchError?.message}`);
+      webhookLogger.error(`[Alpha] ALL BROWSER LAUNCH ATTEMPTS FAILED.`);
+      throw new Error(`Browser launch failed. Last error: ${launchError?.message}`);
     }
 
     const context = await browser.newContext({
