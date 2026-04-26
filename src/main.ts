@@ -200,9 +200,15 @@ app.get('/', (req, res) => {
         .empty-state i { font-size: 3rem; color: var(--text-muted); margin-bottom: 1.5rem; }
         .empty-state h3 { font-size: 1.5rem; color: var(--text-white); margin: 0 0 0.5rem; }
         .empty-state p { color: var(--text-muted); margin: 0; }
-        @media (max-width: 768px) { .stats-bar { grid-template-columns: repeat(2, 1fr); } .search-container { top: 75px; } }
+        @media (max-width: 768px) { 
+          .stats-bar { grid-template-columns: repeat(3, 1fr); gap: 1rem; } 
+          .search-container { top: 75px; } 
+        }
         @media (max-width: 640px) {
-          .stats-bar { grid-template-columns: 1fr; margin-top: -1rem; }
+          .stats-bar { grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin-top: -1rem; padding: 0 1rem; }
+          .stat-card { padding: 1rem 0.25rem; }
+          .stat-value { font-size: 1.1rem; }
+          .stat-label { font-size: 0.55rem; letter-spacing: 0.05em; }
           .endpoint-info { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
           .endpoint-trigger { padding: 1.25rem; }
           .method-badge { font-size: 0.7rem; padding: 0.25rem 0.75rem; }
