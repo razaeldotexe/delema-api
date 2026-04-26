@@ -69,7 +69,7 @@ const commonHead = `
       <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
       <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css">
       <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/json.min.js"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/javascript.min.js"></script>
@@ -202,7 +202,7 @@ app.get('/', (req, res) => {
         .status-success { background: rgba(35, 134, 54, 0.12); color: #3fb950; }
         .status-error { background: rgba(248, 81, 73, 0.12); color: #f85149; }
         .response-body-wrapper { position: relative; border-radius: 10px; overflow: hidden; border: 1px solid var(--border); width: 100%; max-width: 100%; box-sizing: border-box; }
-        .response-body { background: #010409; color: #e6edf3; padding: 1.5rem; font-family: var(--font-mono); font-size: 0.9rem; max-height: 600px; overflow: auto; white-space: pre-wrap; line-height: 1.6; word-break: break-all; overflow-wrap: anywhere; }
+        .response-body { background: #ffffff; color: #24292f; padding: 1.5rem; font-family: var(--font-mono); font-size: 0.9rem; max-height: 600px; overflow: auto; white-space: pre-wrap; line-height: 1.6; word-break: break-all; overflow-wrap: anywhere; }
         .response-body pre { white-space: pre-wrap !important; word-break: break-all !important; overflow-wrap: anywhere !important; }
         .response-body-wrapper .copy-btn { position: absolute; top: 1rem; right: 1rem; z-index: 10; opacity: 0.5; }
         .response-body-wrapper:hover .copy-btn { opacity: 1; }
