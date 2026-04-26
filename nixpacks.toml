@@ -1,5 +1,5 @@
 [phases.setup]
-nixPkgs = ["nodejs", "pnpm", "google-chrome", "playwright-driver"]
+nixPkgs = ["nodejs", "pnpm", "google-chrome", "chromium", "playwright-driver"]
 
 [phases.build]
 dependsOn = ["setup"]

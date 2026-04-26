@@ -111,7 +111,18 @@ class WebhookLogger {
         this.allLogs.push(...this.queue);
         this.queue = [];
 
-        const logsDisplay = this.allLogs.slice(-40).join('\n');
+        let logsDisplay = this.allLogs.slice(-40).join('\n');
+        
+        // Discord limit is 2000 chars, we trim to be safe
+        if (logsDisplay.length > 1800) {
+            logsDisplay = '...' + logsDisplay.slice(-1800);
+        }
+
+        if (!logsDisplay.trim()) {
+            this.isProcessing = false;
+            return;
+        }
+
         const header = `📡 **Delema API** • <t:${this.startTimestamp}:t> (<t:${this.startTimestamp}:R>)`;
         const content = `${header}\n\`\`\`log\n${logsDisplay}\n\`\`\``;
 
