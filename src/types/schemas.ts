@@ -307,6 +307,17 @@ export const WeatherResponseSchema = z.object({
 
 export type WeatherResponse = z.infer<typeof WeatherResponseSchema>;
 
+export const WeatherRequestSchema = z.object({
+  city: z.string().optional(),
+  lat: z.coerce.number().optional(),
+  lon: z.coerce.number().optional(),
+}).refine(data => data.city || (data.lat !== undefined && data.lon !== undefined), {
+  message: "Provide either 'city' or both 'lat' and 'lon'",
+  path: ['city', 'lat', 'lon'],
+});
+
+export type WeatherRequest = z.infer<typeof WeatherRequestSchema>;
+
 // --- Outfit Rating ---
 
 export const OutfitRatingRequestSchema = z
@@ -370,9 +381,13 @@ export const CodeRefactorSchema = z.object({
 export type CodeRefactorRequest = z.infer<typeof CodeRefactorSchema>;
 
 export const DocsLookupSchema = z.object({
-  query: z.string().min(1),
+  query: z.string().min(1).optional(),
+  q: z.string().min(1).optional(),
   framework: z.string().optional().nullable(),
   lang: z.string().optional().nullable(),
+}).refine(data => data.query || data.q, {
+  message: "Provide either 'query' or 'q'",
+  path: ['query', 'q'],
 });
 
 export type DocsLookupRequest = z.infer<typeof DocsLookupSchema>;
