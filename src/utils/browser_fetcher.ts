@@ -21,7 +21,12 @@ export async function searchWithBrowser(query: string, limit = 5): Promise<Brows
     
     browser = await chromium.launch({ 
       headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox']
+      args: [
+        '--no-sandbox', 
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--single-process'
+      ]
     });
 
     const context = await browser.newContext({
