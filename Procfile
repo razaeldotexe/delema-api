@@ -1,1 +1,1 @@
-web: PLAYWRIGHT_BROWSERS_PATH=./node_modules/pw-browsers node dist/main.js
+web: node dist/main.js

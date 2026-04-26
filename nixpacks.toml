@@ -1,16 +1,9 @@
 [phases.setup]
-nixPkgs = ["nodejs", "pnpm", "playwright-driver"]
+nixPkgs = ["nodejs", "pnpm", "chromium", "playwright-driver"]
 
 [phases.build]
 dependsOn = ["setup"]
-cmds = [
-    "pnpm install", 
-    "PLAYWRIGHT_BROWSERS_PATH=./node_modules/pw-browsers npx playwright install chromium", 
-    "pnpm run build"
-]
+cmds = ["pnpm install", "pnpm run build"]
 
 [start]
 cmd = "node dist/main.js"
-
-[variables]
-PLAYWRIGHT_BROWSERS_PATH = "./node_modules/pw-browsers"

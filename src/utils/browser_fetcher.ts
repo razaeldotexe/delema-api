@@ -17,16 +17,24 @@ export async function searchWithBrowser(query: string, limit = 5): Promise<Brows
   let browser: Browser | null = null;
 
   try {
-    webhookLogger.info(`[Alpha] Launching browser for: ${query}`);
+    webhookLogger.info(`[Alpha] Launching system browser for: ${query}`);
     
     browser = await chromium.launch({ 
       headless: true,
+      executablePath: '/usr/bin/chromium', // Standard path in Nixpacks with chromium pkg
       args: [
         '--no-sandbox', 
         '--disable-setuid-sandbox',
         '--disable-dev-shm-usage',
         '--single-process'
       ]
+    }).catch(async (err) => {
+      webhookLogger.warn(`Failed to launch at /usr/bin/chromium, trying default PATH...`);
+      return await chromium.launch({
+        headless: true,
+        executablePath: 'chromium', // Fallback to PATH
+        args: ['--no-sandbox', '--disable-setuid-sandbox']
+      });
     });
 
     const context = await browser.newContext({
