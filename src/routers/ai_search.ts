@@ -1,13 +1,13 @@
 import { Router, Request, Response } from 'express';
 import { webhookLogger } from '../utils/logger';
-import { fetchWebResults } from '../utils/product_fetcher';
-import { SearchRequestSchema } from '../types/schemas';
+import { fetchWebResults } from '../utils/search_fetcher';
+import { AISearchRequestSchema } from '../types/schemas';
 import { tryAllProviders } from '../utils/ai_helper';
 
 const router = Router();
 
 router.post('/search', async (req: Request, res: Response) => {
-  const validation = SearchRequestSchema.safeParse(req.body);
+  const validation = AISearchRequestSchema.safeParse(req.body);
   if (!validation.success) {
     return res.status(422).json({ detail: validation.error.errors });
   }

@@ -19,14 +19,14 @@ export interface SearchResult {
 }
 
 /**
- * Mengambil data produk riil dari DuckDuckGo Search (Shopping/Web results).
+ * Mengambil data hasil pencarian riil dari DuckDuckGo Search (Web results).
  */
 export async function fetchRealProducts(query: string, maxResults = 5): Promise<ProductResult[]> {
   const results: ProductResult[] = [];
   try {
-    webhookLogger.info(`Fetching real products for: ${query}`);
+    webhookLogger.info(`AI Search: Fetching results for: ${query}`);
 
-    // Mencari di DuckDuckGo dengan keyword shopping agar data lebih akurat
+    // Mencari di DuckDuckGo dengan keyword tambahan agar data lebih relevan
     const searchQuery = `${query} price buy online`;
 
     let count = 0;
@@ -34,7 +34,7 @@ export async function fetchRealProducts(query: string, maxResults = 5): Promise<
       if (count >= maxResults) break;
 
       results.push({
-        name: r.title || 'Unknown Product',
+        name: r.title || 'Unknown Result',
         description: r.body || 'No description available.',
         source_url: r.href || '#',
         source_name: 'Web Result',
@@ -43,7 +43,7 @@ export async function fetchRealProducts(query: string, maxResults = 5): Promise<
       count++;
     }
 
-    webhookLogger.success(`Found ${results.length} real product links.`);
+    webhookLogger.success(`AI Search: Found ${results.length} results.`);
   } catch (error) {
     webhookLogger.error(
       `Scraper failed: ${error instanceof Error ? error.message : String(error)}`

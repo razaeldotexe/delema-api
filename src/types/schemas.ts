@@ -80,15 +80,15 @@ export type ABTestRequest = z.infer<typeof ABTestRequestSchema>;
 
 // --- AI Search ---
 
-export const ProductSearchRequestSchema = z.object({
+export const AISearchRequestSchema = z.object({
   query: z.string(),
   limit: z.number().optional().default(5),
   lang: z.string().optional().nullable(),
 });
 
-export type ProductSearchRequest = z.infer<typeof ProductSearchRequestSchema>;
+export type AISearchRequest = z.infer<typeof AISearchRequestSchema>;
 
-export const ProductResultSchema = z.object({
+export const ProductInfoSchema = z.object({
   name: z.string(),
   description: z.string(),
   price: z.string(),
@@ -96,7 +96,7 @@ export const ProductResultSchema = z.object({
   source_name: z.string().optional().default('AI Recommended'),
 });
 
-export type ProductResult = z.infer<typeof ProductResultSchema>;
+export type ProductInfo = z.infer<typeof ProductInfoSchema>;
 
 // --- Search Browser ---
 
