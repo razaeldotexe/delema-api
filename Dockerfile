@@ -1,5 +1,5 @@
-# Use the official Playwright image
-FROM mcr.microsoft.com/playwright:v1.47.0-focal
+# Use the official Playwright image compatible with the current version
+FROM mcr.microsoft.com/playwright:v1.59.1-noble
 
 # Set working directory
 WORKDIR /app
