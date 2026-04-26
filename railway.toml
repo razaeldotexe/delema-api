@@ -1,7 +1,7 @@
 [build]
-builder = "NIXPACKS"
+builder = "DOCKER"
+dockerfilePath = "Dockerfile"
 
 [deploy]
-startCommand = "node dist/main.js"
 healthCheckPath = "/"
 restartPolicyType = "ON_FAILURE"
