@@ -149,3 +149,56 @@ export async function searchWithBrowser(query: string, limit = 5): Promise<Brows
 
   return results;
 }
+
+/**
+ * Dedicated Brave Search scraper (Alpha).
+ * Specifically designed for reliability and speed using Brave.
+ */
+export async function searchWithBrave(query: string, limit = 5): Promise<BrowserSearchResult[]> {
+  const results: BrowserSearchResult[] = [];
+  let browser: Browser | null = null;
+
+  try {
+    webhookLogger.info(`[Alpha-Brave] Launching browser for: ${query}`);
+    
+    browser = await chromium.launch({ 
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
+    });
+
+    const context = await browser.newContext({
+      userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+    });
+
+    const page: Page = await context.newPage();
+
+    await page.goto(`https://search.brave.com/search?q=${encodeURIComponent(query)}`, {
+      waitUntil: 'domcontentloaded',
+      timeout: 15000
+    });
+
+    const braveResults = await page.$$eval('.snippet', (elements) => {
+      return elements.map(el => {
+        const titleEl = el.querySelector('.title');
+        const linkEl = el.querySelector('a');
+        const snippetEl = el.querySelector('.snippet-content, .snippet-description');
+
+        return {
+          title: titleEl?.textContent || '',
+          url: linkEl?.href || '',
+          snippet: snippetEl?.textContent || ''
+        };
+      }).filter(item => item.title && item.url);
+    });
+
+    webhookLogger.success(`[Alpha-Brave] Found ${braveResults.length} results.`);
+    braveResults.slice(0, limit).forEach(item => results.push({ ...item, source: 'Brave (Alpha)' }));
+
+  } catch (error: any) {
+    webhookLogger.error(`[Alpha-Brave] Search failed: ${error.message}`);
+  } finally {
+    if (browser) await browser.close();
+  }
+
+  return results;
+}
