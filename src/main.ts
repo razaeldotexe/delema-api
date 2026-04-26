@@ -232,8 +232,8 @@ app.get('/', (req, res) => {
         <p>Decision Support & Research Infrastructure • v1.7.0</p>
       </div>
       <div class="stats-bar">
-        <div class="stat-card"><span class="stat-value">7+</span><span class="stat-label">Routers</span></div>
-        <div class="stat-card"><span class="stat-value">16+</span><span class="stat-label">Endpoints</span></div>
+        <div class="stat-card"><span class="stat-value">8+</span><span class="stat-label">Routers</span></div>
+        <div class="stat-card"><span class="stat-value">21+</span><span class="stat-label">Endpoints</span></div>
         <div class="stat-card"><span class="stat-value">v1.7.0</span><span class="stat-label">Version</span></div>
       </div>
       <div class="search-container">
@@ -267,6 +267,13 @@ app.get('/', (req, res) => {
             { path: "/code/generate", name: "CODE GENERATE", method: "POST", desc: "Generate kode berdasarkan prompt.", body: { prompt: "Create a simple express server", language: "typescript", framework: "express", lang: "English" } },
             { path: "/code/refactor", name: "CODE REFACTOR", method: "POST", desc: "Refactor kode untuk kualitas lebih baik.", body: { code: "var x = 10; if(x == 10) { console.log(x) }", instruction: "Use modern syntax", language: "javascript", lang: "English" } },
             { path: "/docs", name: "DOCS SEARCH", method: "GET", desc: "Cari dokumentasi dan sintesis jawaban AI.", body: null, queryParams: "q=useEffect&framework=react&lang=English" }
+          ]},
+          { category: "Automation Tools", icon: "fa-robot", endpoints: [
+            { path: "/tools/json", name: "JSON UTILS", method: "POST", desc: "Prettify, Minify, Validate, or Diff JSON.", body: { action: "prettify", input: '{"a":1,"b":2}' } },
+            { path: "/tools/format", name: "CODE FORMAT", method: "POST", desc: "Format code using Prettier.", body: { language: "javascript", code: "function test(){console.log('hi')}" } },
+            { path: "/tools/crypto", name: "CRYPTO", method: "POST", desc: "Hashing (MD5, SHA256) or Base64 encoding/decoding.", body: { action: "hash", type: "sha256", input: "hello world" } },
+            { path: "/tools/url", name: "URL UTILS", method: "POST", desc: "Parse, Encode, or Decode URLs.", body: { action: "parse", input: "https://example.com/search?q=openzero" } },
+            { path: "/tools/time", name: "TIME UTILS", method: "POST", desc: "Get current time or convert timestamps.", body: { action: "now" } }
           ]}
         ];
         function renderEndpoints() {
