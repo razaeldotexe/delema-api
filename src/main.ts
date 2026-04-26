@@ -170,11 +170,11 @@ app.get('/', (req, res) => {
         .search-box i { color: var(--text-muted); margin-right: 1.25rem; font-size: 1.2rem; }
         .search-box input { background: transparent; border: none; color: var(--text-white); width: 100%; outline: none; font-size: 1.05rem; font-weight: 500; font-family: var(--font-main); }
         .content { max-width: 900px; margin: 0 auto 5rem; padding: 0 1.5rem; }
-        .category-header { display: flex; align-items: center; justify-content: space-between; margin: 4rem 0 1.5rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border); }
-        .category-header h2 { margin: 0; font-size: 1.4rem; color: var(--text-white); font-weight: 900; display: flex; align-items: center; gap: 1rem; }
-        .category-header h2 i { color: var(--primary); font-size: 1.1rem; }
-        .category-header span { background: var(--bg-hover); color: var(--text-muted); font-size: 0.7rem; font-weight: 800; padding: 0.3rem 0.75rem; border-radius: 8px; letter-spacing: 0.05em; }
-        .endpoint-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 1rem; overflow: hidden; transition: all 0.2s ease; }
+        .category-header { display: flex; align-items: center; justify-content: space-between; margin: 4rem 0 1.5rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border); gap: 1rem; }
+        .category-header h2 { margin: 0; font-size: 1.4rem; color: var(--text-white); font-weight: 900; display: flex; align-items: center; gap: 1rem; min-width: 0; }
+        .category-header h2 i { color: var(--primary); font-size: 1.1rem; flex-shrink: 0; }
+        .category-header span { background: var(--bg-hover); color: var(--text-muted); font-size: 0.7rem; font-weight: 800; padding: 0.3rem 0.75rem; border-radius: 8px; letter-spacing: 0.05em; flex-shrink: 0; white-space: nowrap; }
+        .endpoint-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 1rem; overflow: hidden; transition: all 0.2s ease; width: 100%; box-sizing: border-box; }
         .endpoint-card:hover { border-color: #40464d; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
         .endpoint-trigger { width: 100%; padding: 1.5rem; display: flex; align-items: center; justify-content: space-between; background: none; border: none; cursor: pointer; text-align: left; }
         .endpoint-info { display: flex; align-items: center; gap: 1.25rem; flex-wrap: wrap; }
@@ -201,8 +201,8 @@ app.get('/', (req, res) => {
         .response-status { font-size: 0.85rem; font-weight: 800; padding: 0.3rem 0.75rem; border-radius: 6px; font-family: var(--font-mono); }
         .status-success { background: rgba(35, 134, 54, 0.12); color: #3fb950; }
         .status-error { background: rgba(248, 81, 73, 0.12); color: #f85149; }
-        .response-body-wrapper { position: relative; border-radius: 10px; overflow: hidden; border: 1px solid var(--border); }
-        .response-body { background: #010409; color: #e6edf3; padding: 1.5rem; font-family: var(--font-mono); font-size: 0.9rem; max-height: 600px; overflow: auto; white-space: pre-wrap; line-height: 1.6; }
+        .response-body-wrapper { position: relative; border-radius: 10px; overflow: hidden; border: 1px solid var(--border); width: 100%; max-width: 100%; box-sizing: border-box; }
+        .response-body { background: #010409; color: #e6edf3; padding: 1.5rem; font-family: var(--font-mono); font-size: 0.9rem; max-height: 600px; overflow: auto; white-space: pre-wrap; line-height: 1.6; word-break: break-all; overflow-wrap: anywhere; }
         .response-body-wrapper .copy-btn { position: absolute; top: 1rem; right: 1rem; z-index: 10; opacity: 0.5; }
         .response-body-wrapper:hover .copy-btn { opacity: 1; }
         .empty-state { text-align: center; padding: 5rem 2rem; background: var(--bg-card); border-radius: var(--radius); border: 1px dashed var(--border); margin-top: 2rem; }
