@@ -194,6 +194,7 @@ class WebhookLogger {
     // Helper methods for semantic logging
     public info(msg: string) { this.log(msg, 'INFO'); }
     public warn(msg: string) { this.log(msg, 'WARN'); }
+    public warning(msg: string) { this.warn(msg); } // Alias for libraries like duckduckgo-search
     public error(msg: string, err?: any) { 
         this.log(msg, 'ERROR'); 
         if (err) console.error(err);

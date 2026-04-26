@@ -2,6 +2,9 @@ import ddgs from 'duckduckgo-search';
 import axios from 'axios';
 import { webhookLogger } from './logger';
 
+// @ts-ignore - Patching ddgs to use our logger which has the expected .warning() method
+ddgs.logger = webhookLogger;
+
 export interface DocsResult {
   title: string;
   content: string;
