@@ -376,3 +376,42 @@ export const DocsLookupSchema = z.object({
 });
 
 export type DocsLookupRequest = z.infer<typeof DocsLookupSchema>;
+
+// --- Automation Tools ---
+
+export const JsonToolRequestSchema = z.object({
+  action: z.enum(['prettify', 'minify', 'validate', 'diff']),
+  input: z.string(),
+  input2: z.string().optional(),
+});
+
+export type JsonToolRequest = z.infer<typeof JsonToolRequestSchema>;
+
+export const CodeFormatRequestSchema = z.object({
+  language: z.enum(['javascript', 'typescript', 'json', 'html', 'css']),
+  code: z.string(),
+});
+
+export type CodeFormatRequest = z.infer<typeof CodeFormatRequestSchema>;
+
+export const CryptoToolRequestSchema = z.object({
+  action: z.enum(['hash', 'encode', 'decode']),
+  type: z.enum(['md5', 'sha256', 'base64']),
+  input: z.string(),
+});
+
+export type CryptoToolRequest = z.infer<typeof CryptoToolRequestSchema>;
+
+export const UrlToolRequestSchema = z.object({
+  action: z.enum(['parse', 'encode', 'decode']),
+  input: z.string(),
+});
+
+export type UrlToolRequest = z.infer<typeof UrlToolRequestSchema>;
+
+export const TimeToolRequestSchema = z.object({
+  action: z.enum(['now', 'convert']),
+  input: z.union([z.string(), z.number()]).optional(),
+});
+
+export type TimeToolRequest = z.infer<typeof TimeToolRequestSchema>;

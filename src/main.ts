@@ -14,6 +14,7 @@ import fdaRouter from './routers/fda';
 import weatherRouter from './routers/weather';
 import codeRouter from './routers/code';
 import docsRouter from './routers/docs';
+import toolsRouter from './routers/tools';
 
 dotenv.config();
 
@@ -58,6 +59,7 @@ app.use(`${apiPrefix}/fda`, fdaRouter);
 app.use(`${apiPrefix}/weather`, weatherRouter);
 app.use(`${apiPrefix}/code`, codeRouter);
 app.use(`${apiPrefix}/docs`, docsRouter);
+app.use(`${apiPrefix}/tools`, toolsRouter);
 
 const commonHead = `
     <head>
