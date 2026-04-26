@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { webhookLogger } from '../utils/logger';
 import { fetchWebResults } from '../utils/search_fetcher';
+import { searchWithBrowser } from '../utils/browser_fetcher';
 import { AISearchRequestSchema } from '../types/schemas';
 import { tryAllProviders } from '../utils/ai_helper';
 
@@ -15,11 +16,28 @@ router.post('/search', async (req: Request, res: Response) => {
   const { query, limit = 5, lang } = validation.data;
 
   try {
-    // Phase 1: Fetch Real Data
-    const webResults = await fetchWebResults(query, limit);
+    let webResults;
+    let engine = 'duckduckgo';
 
-    if (webResults.length === 0) {
-      return res.json({ results: [], ai_summary: 'No results found on the web.' });
+    try {
+      // Phase 1: Try Standard DDG Search
+      webResults = await fetchWebResults(query, limit);
+      if (webResults.length === 0) throw new Error('No results from DDG');
+    } catch (ddgError: any) {
+      webhookLogger.warn(`Standard search failed: ${ddgError.message}. Falling back to Browser search...`);
+      // Fallback to Playwright
+      const browserResults = await searchWithBrowser(query, limit);
+      webResults = browserResults.map(r => ({
+        title: r.title,
+        snippet: r.snippet,
+        url: r.url,
+        source: r.source
+      }));
+      engine = 'playwright-fallback';
+    }
+
+    if (!webResults || webResults.length === 0) {
+      return res.json({ results: [], ai_summary: 'No results found on the web.', engine });
     }
 
     let contextStr = 'Here are some real search results from the web to help you:\n';

@@ -17,25 +17,36 @@ export async function searchWithBrowser(query: string, limit = 5): Promise<Brows
   let browser: Browser | null = null;
 
   try {
-    webhookLogger.info(`[Alpha] Launching system browser for: ${query}`);
-    
-    browser = await chromium.launch({ 
-      headless: true,
-      executablePath: '/usr/bin/chromium', // Standard path in Nixpacks with chromium pkg
-      args: [
-        '--no-sandbox', 
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',
-        '--single-process'
-      ]
-    }).catch(async (err) => {
-      webhookLogger.warn(`Failed to launch at /usr/bin/chromium, trying default PATH...`);
-      return await chromium.launch({
-        headless: true,
-        executablePath: 'chromium', // Fallback to PATH
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
-      });
-    });
+    const possiblePaths = [
+      '/usr/bin/chromium',
+      '/usr/bin/google-chrome',
+      '/usr/bin/chromium-browser',
+      'chromium',
+      'google-chrome'
+    ];
+
+    let launchError = null;
+    for (const path of possiblePaths) {
+      try {
+        webhookLogger.debug(`[Alpha] Attempting to launch browser at: ${path}`);
+        browser = await chromium.launch({ 
+          headless: true,
+          executablePath: path.includes('/') ? path : undefined,
+          args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
+        });
+        if (browser) {
+          webhookLogger.info(`[Alpha] Browser launched successfully using: ${path}`);
+          break;
+        }
+      } catch (err: any) {
+        launchError = err;
+        continue;
+      }
+    }
+
+    if (!browser) {
+      throw new Error(`Could not launch browser from any known path. Last error: ${launchError?.message}`);
+    }
 
     const context = await browser.newContext({
       userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
