@@ -9,6 +9,7 @@ import { initDB } from './utils/db';
 // Import Routers
 import researchRouter from './routers/research';
 import aiSearchRouter from './routers/ai_search';
+import aiSearchAlphaRouter from './routers/ai_search_alpha';
 import fdaRouter from './routers/fda';
 import weatherRouter from './routers/weather';
 import codeRouter from './routers/code';
@@ -52,6 +53,7 @@ webhookLogger.system('Delema API (Node.js) is starting up...');
 const apiPrefix = '/api/delema/v1';
 app.use(`${apiPrefix}/research`, researchRouter);
 app.use(`${apiPrefix}/ai`, aiSearchRouter);
+app.use(`${apiPrefix}/ai/alpha`, aiSearchAlphaRouter);
 app.use(`${apiPrefix}/fda`, fdaRouter);
 app.use(`${apiPrefix}/weather`, weatherRouter);
 app.use(`${apiPrefix}/code`, codeRouter);
@@ -220,12 +222,12 @@ app.get('/', (req, res) => {
       ${commonHeader}
       <div class="hero">
         <h1>THE <span class="accent">INTELLIGENT</span> ENGINE</h1>
-        <p>Decision Support & Research Infrastructure • v1.2.0</p>
+        <p>Decision Support & Research Infrastructure • v1.7.0</p>
       </div>
       <div class="stats-bar">
-        <div class="stat-card"><span class="stat-value">6+</span><span class="stat-label">Routers</span></div>
-        <div class="stat-card"><span class="stat-value">15+</span><span class="stat-label">Endpoints</span></div>
-        <div class="stat-card"><span class="stat-value">v1.2.0</span><span class="stat-label">Version</span></div>
+        <div class="stat-card"><span class="stat-value">7+</span><span class="stat-label">Routers</span></div>
+        <div class="stat-card"><span class="stat-value">16+</span><span class="stat-label">Endpoints</span></div>
+        <div class="stat-card"><span class="stat-value">v1.7.0</span><span class="stat-label">Version</span></div>
       </div>
       <div class="search-container">
         <div class="search-box">
@@ -243,7 +245,8 @@ app.get('/', (req, res) => {
             { path: "/research/nerdfont", name: "NERD FONTS", method: "POST", desc: "Cari dan unduh Nerd Fonts.", body: { query: "JetBrains" } }
           ]},
           { category: "AI Search", icon: "fa-brain", endpoints: [
-            { path: "/ai/search", name: "AI SEARCH", method: "POST", desc: "Pencarian pintar berbasis AI untuk berbagai konten.", body: { query: "macbook air", limit: 3, lang: "English" } }
+            { path: "/ai/search", name: "AI SEARCH", method: "POST", desc: "Pencarian pintar berbasis AI untuk berbagai konten.", body: { query: "macbook air", limit: 3, lang: "English" } },
+            { path: "/ai/alpha/search", name: "AI SEARCH ALPHA", method: "POST", desc: "Deep Search menggunakan Playwright Browser (Slow but Detailed).", body: { query: "berita terbaru hari ini", limit: 5, lang: "Indonesian" } }
           ]},
           { category: "Health & Safety", icon: "fa-shield-heart", endpoints: [
             { path: "/fda/search", name: "FDA SEARCH", method: "POST", desc: "Cari data obat, makanan, atau peralatan medis dari OpenFDA.", body: { query: "tylenol", category: "drug", limit: 5, lang: "Indonesian" } }
@@ -415,6 +418,7 @@ app.get('/api-docs', (req, res) => {
         <ul>
           <li><span class="highlight">Global:</span> 100 requests / 15 menit (untuk Utilities dan Docs).</li>
           <li><span class="highlight">AI & Research:</span> 20 requests / 15 menit (ArXiv, Wikipedia, AI Search).</li>
+          <li><span class="highlight">Alpha (Browser):</span> 10 requests / 15 menit (AI Search Alpha).</li>
         </ul>
         <h2>Response Format</h2>
         <p>Format respons standar menggunakan JSON. Field <code>ai_summary</code> berisi sintesis cerdas dari data riil yang ditemukan.</p>
@@ -422,19 +426,21 @@ app.get('/api-docs', (req, res) => {
           <button class="copy-btn" onclick="copyText(this)"><i class="far fa-copy"></i> Copy</button>
           <pre><code>{
   "results": [...],
-  "ai_summary": "TL;DR: Sintesis pintar dari data penelitian terkini."
+  "ai_summary": "TL;DR: Sintesis pintar dari data penelitian terkini.",
+  "engine": "playwright-alpha"
 }</code></pre>
         </div>
         <h2>Node.js / Fetch Integration</h2>
         <p>Contoh pemanggilan API menggunakan JavaScript modern:</p>
         <div class="code-block-wrapper">
           <button class="copy-btn" onclick="copyText(this)"><i class="far fa-copy"></i> Copy</button>
-          <pre><code>const callApi = async () => {
-  const res = await fetch('https://delema.razael-fox.my.id/api/delema/v1/research/arxiv', {
+          <pre><code>// Example: AI Search Alpha (Deep Search)
+const callAlpha = async () => {
+  const res = await fetch('https://delema.razael-fox.my.id/api/delema/v1/ai/alpha/search', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      query: 'Quantum Computing',
+      query: 'Trend teknologi 2026',
       lang: 'Indonesian'
     })
   });

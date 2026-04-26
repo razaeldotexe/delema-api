@@ -1,9 +1,9 @@
 [phases.setup]
-nixPkgs = ["nodejs", "pnpm"]
+nixPkgs = ["nodejs", "pnpm", "playwright-driver"]
 
 [phases.build]
 dependsOn = ["setup"]
-cmds = ["pnpm install && pnpm run build"]
+cmds = ["pnpm install && npx playwright install --with-deps chromium && pnpm run build"]
 
 [start]
 cmd = "node dist/main.js"
