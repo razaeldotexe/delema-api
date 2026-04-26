@@ -18,10 +18,10 @@ export async function searchWithBrowser(query: string, limit = 5): Promise<Brows
 
   try {
     const possiblePaths = [
-      '/usr/bin/google-chrome',
       '/usr/bin/chromium',
-      'google-chrome',
-      'chromium'
+      '/usr/bin/google-chrome',
+      'chromium',
+      'google-chrome'
     ];
 
     let launchError = null;
