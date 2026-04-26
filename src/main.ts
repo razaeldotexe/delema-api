@@ -365,21 +365,29 @@ app.get('/api-docs', (req, res) => {
     <html lang="en">
     ${commonHead}
     <style>
-        .container { max-width: 900px; margin: 5rem auto; padding: 0 2rem; flex: 1; }
+        .container { max-width: 900px; margin: 5rem auto; padding: 0 2rem; flex: 1; width: 100%; }
         h1 { font-size: clamp(2.2rem, 7vw, 3.2rem); font-weight: 950; color: var(--text-white); margin-bottom: 1.5rem; letter-spacing: -0.03em; }
         h2 { font-size: 1.7rem; font-weight: 800; color: var(--text-white); margin: 3.5rem 0 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 1rem; }
-        p { font-size: 1.1rem; line-height: 1.8; margin-bottom: 1.75rem; color: var(--text-main); }
-        code { font-family: var(--font-mono); background: var(--bg-card); padding: 0.3rem 0.6rem; border-radius: 6px; color: #a5d6ff; font-size: 0.9em; border: 1px solid var(--border); }
-        .code-block-wrapper { position: relative; margin: 2rem 0; box-shadow: 0 8px 30px rgba(0,0,0,0.4); border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); }
-        pre { background: #010409; padding: 2rem; margin: 0; overflow-x: auto; line-height: 1.8; font-size: 0.95rem; }
+        p { font-size: 1.1rem; line-height: 1.8; margin-bottom: 1.75rem; color: var(--text-main); word-wrap: break-word; }
+        code { font-family: var(--font-mono); background: var(--bg-card); padding: 0.3rem 0.6rem; border-radius: 6px; color: #a5d6ff; font-size: 0.9em; border: 1px solid var(--border); word-break: break-word; }
+        .code-block-wrapper { position: relative; margin: 2rem 0; box-shadow: 0 8px 30px rgba(0,0,0,0.4); border-radius: var(--radius); overflow: hidden; border: 1px solid var(--border); width: 100%; }
+        pre { background: #010409; padding: 2rem; margin: 0; overflow-x: auto; line-height: 1.8; font-size: 0.95rem; width: 100%; }
         .code-block-wrapper .copy-btn { position: absolute; top: 1rem; right: 1rem; z-index: 10; opacity: 0.6; }
         .code-block-wrapper:hover .copy-btn { opacity: 1; }
         .highlight { color: var(--primary); font-weight: 800; }
         ul { padding-left: 1.5rem; margin-bottom: 2.5rem; }
-        li { margin-bottom: 0.85rem; font-size: 1.05rem; }
-        .info-card { background: rgba(79, 70, 229, 0.08); border-left: 4px solid var(--primary); padding: 1.75rem; border-radius: 10px; margin: 3rem 0; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        li { margin-bottom: 0.85rem; font-size: 1.05rem; word-wrap: break-word; }
+        .info-card { background: rgba(79, 70, 229, 0.08); border-left: 4px solid var(--primary); padding: 1.75rem; border-radius: 10px; margin: 3rem 0; box-shadow: 0 4px 15px rgba(0,0,0,0.1); word-wrap: break-word; }
         .info-card i { color: var(--primary); margin-right: 1rem; font-size: 1.2rem; }
-        @media (max-width: 640px) { .container { margin: 3rem auto; padding: 0 1.5rem; } h1 { font-size: 2rem; } }
+        @media (max-width: 640px) { 
+          .container { margin: 3rem auto; padding: 0 1.25rem; } 
+          h1 { font-size: 2.2rem; }
+          h2 { font-size: 1.5rem; margin-top: 2.5rem; }
+          pre { padding: 1.5rem; font-size: 0.85rem; }
+          .info-card { padding: 1.25rem; margin: 2rem 0; }
+          p { font-size: 1rem; }
+          li { font-size: 0.95rem; }
+        }
     </style>
     </head>
     <body>
