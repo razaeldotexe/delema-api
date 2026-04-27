@@ -328,14 +328,6 @@ app.get('/', (req, res) => {
         </div>
 
         <div class="max-w-7xl mx-auto text-center relative z-10">
-          <div class="mb-8 animate-fade-in">
-            <img 
-              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/full_icon-XTtiCTsY6QjoCpnsd7io8clRLzrppc.png"
-              alt="Delema API Logo"
-              class="w-32 h-32 mx-auto mb-6 animate-pulse"
-            />
-          </div>
-
           <h1 class="text-5xl sm:text-6xl lg:text-7xl font-bold text-white mb-6 fade-in-up">
             Delema <span class="gradient-rainbow-text">API</span>
           </h1>
