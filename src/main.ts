@@ -36,6 +36,7 @@ app.use((req, res, next) => {
 });
 
 app.use(express.json());
+app.use(express.static('public'));
 app.use(requestLogger);
 
 // Global Rate Limiter: 100 requests per 15 minutes
@@ -65,6 +66,7 @@ const commonHead = `
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link rel="icon" type="image/png" href="/logo.png">
       <link rel="preconnect" href="https://fonts.googleapis.com">
       <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
       <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
@@ -184,7 +186,7 @@ const commonHeader = `
             <!-- Logo -->
             <div class="flex items-center gap-2 cursor-pointer" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
               <img 
-                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/full_icon-XTtiCTsY6QjoCpnsd7io8clRLzrppc.png"
+                src="/logo.png"
                 alt="Delema API"
                 class="h-8 w-8"
               />
@@ -246,7 +248,7 @@ const commonFooter = `
             <div>
               <div class="flex items-center gap-2 mb-4">
                 <img 
-                  src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/full_icon-XTtiCTsY6QjoCpnsd7io8clRLzrppc.png"
+                  src="/logo.png"
                   alt="Delema API"
                   class="h-8 w-8"
                 />
